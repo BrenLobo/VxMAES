@@ -35,8 +35,7 @@ typedef struct letboot
 MAESAgent water_temp, oil_pressure, tire_pressure, inspector;
 Agent_Platform AP;
 sysVars env;
-CyclicBehaviour ins_behaviour;
-OneShotBehaviour oil_behaviour, tire_behaviour,water_behaviour;
+CyclicBehaviour ins_behaviour, oil_behaviour, tire_behaviour,water_behaviour;
 Agent_Msg water_msg, oil_msg, tire_msg, ins_msg;
 bootable water_pass, oil_pass, tire_pass,*data;
 char content[80];
@@ -47,13 +46,13 @@ float min, max, value;
 /*   Function related to each measure agent   */
 /**********************************************/
 // setup
-void meaSetup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
+void meaSetup(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->Agent_Msg(Behaviour->msg);
 	Behaviour->msg->add_receiver(Behaviour->msg, inspector.AID(&inspector));
 }
 
 // action
-void Meas_Action(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
+void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = AP.get_Agent_description(AP.get_running_agent(&AP));
 	printf("\n Agente en ejecucion de medicion: %s \n",informacion.agent_name);
 	data = (bootable*)taskParam;
@@ -137,42 +136,41 @@ void Verification_Setup(CyclicBehaviour* Behaviour, MAESArgument taskParam){
 void Verification_SysAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	printf("\n........Inicializando arranque sistema........\n");
 	while (true) {
-		if ((AP.get_state(&AP, water_temp.AID(&water_temp)) != SUSPENDED) || (AP.get_state(&AP, oil_pressure.AID(&oil_pressure)) != SUSPENDED) || (AP.get_state(&AP, tire_pressure.AID(&tire_pressure)) != SUSPENDED)){
+		if ((AP.get_state(&AP, water_temp.AID(&water_temp)) == SUSPENDED) && (AP.get_state(&AP, oil_pressure.AID(&oil_pressure)) == SUSPENDED) && (AP.get_state(&AP, tire_pressure.AID(&tire_pressure)) == SUSPENDED)){
+			if ((water_pass.pass == true) && (oil_pass.pass == true) && (tire_pass.pass == true)) {
+				printf("\n  Verificacion del sistema completado   \n");
+				printf("\n........Inicializando arranque sistema2........\n");
+				break;
+			} else {
+				printf("\n-------------Adjust Systems ---------------\n");		
+				break;
+			}
+		} 
+		else{
+//		if ((AP.get_state(&AP, water_temp.AID(&water_temp)) != SUSPENDED) || (AP.get_state(&AP, oil_pressure.AID(&oil_pressure)) != SUSPENDED) || (AP.get_state(&AP, tire_pressure.AID(&tire_pressure)) != SUSPENDED)){
 			Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);
-			if (Behaviour->msg->get_msg_type(Behaviour->msg) == INFORM) {
-				char* mensaje = Behaviour->msg->get_msg_content(Behaviour->msg);
-				Behaviour->msg->suspend(Behaviour->msg, Behaviour->msg->get_sender(Behaviour->msg));				
+			if (Behaviour->msg->get_msg_type(Behaviour->msg) == INFORM){			
+				char* mensaje = Behaviour->msg->get_msg_content(Behaviour->msg);								
 				Agent_info informacion = AP.get_Agent_description(AP.get_running_agent(&AP));
 				printf("\n Agente en ejecucion inspector: %s \n",informacion.agent_name);
+				Behaviour->msg->suspend(Behaviour->msg, Behaviour->msg->get_sender(Behaviour->msg));
 				printf("%s\n", mensaje);
 //				AGENT_MODE estado =AP.get_state(&AP, water_temp.AID(&water_temp));
 //				AGENT_MODE estado1 =AP.get_state(&AP, oil_pressure.AID(&oil_pressure));
 //				AGENT_MODE estado2 =AP.get_state(&AP, tire_pressure.AID(&tire_pressure));
 //				printf("agua: %d,aceite: %d,tire: %d .\n",estado,estado1,estado2);
-				}
+			}
 		}
-		else if ((AP.get_state(&AP, water_temp.AID(&water_temp)) == SUSPENDED) && (AP.get_state(&AP, oil_pressure.AID(&oil_pressure)) == SUSPENDED) && (AP.get_state(&AP, tire_pressure.AID(&tire_pressure)) == SUSPENDED))
-		{
-			if ((water_pass.pass == true) && (oil_pass.pass == true) && (tire_pass.pass == true)) {
-				printf("\n  Verificacion del sistema completado   \n");
-				printf("\n........Inicializando arranque sistema2........\n");
-				break;
-			}
-			else {
-				printf("\n-------------Adjust Systems ---------------\n");		
-				break;
-			}
 		
-		}
 	}
 	water_pass.pass= false;//, oil_pass.pass, tire_pass.pass =false;
 	oil_pass.pass = false;
 	tire_pass.pass = false;
 	AP.agent_wait(&AP, 500);
 	printf("\n-------------Begin Verification---------------\n");
-	Behaviour->msg->restart(Behaviour->msg, water_temp.AID(&water_temp));
-	Behaviour->msg->restart(Behaviour->msg, oil_pressure.AID(&oil_pressure));
-	Behaviour->msg->restart(Behaviour->msg, tire_pressure.AID(&tire_pressure));
+	Behaviour->msg->resume(Behaviour->msg, water_temp.AID(&water_temp));
+	Behaviour->msg->resume(Behaviour->msg, oil_pressure.AID(&oil_pressure));
+	Behaviour->msg->resume(Behaviour->msg, tire_pressure.AID(&tire_pressure));
 	printf("Cycle Ended\n");
 }
 
@@ -208,13 +206,19 @@ void InspectorFunction(MAESArgument taskParam) {
 	ins_behaviour.execute(&ins_behaviour, taskParam);
 };
 
+void stopExecution() {
+    printf("Stopping program execution after 1 minute.\n");
+    exit(0); // Exiting the program
+}
 
 /**********************************************/
 /* 						Main				  */
 /**********************************************/
 int main() {
 	printf("------Boot Verification System ------ \n");
-
+	
+	time_t startTimeInSeconds = time(NULL);
+	printf("%d",startTimeInSeconds);
 	water_pass.pass = false;
 	oil_pass.pass = false;
 	tire_pass.pass = false;
@@ -233,9 +237,9 @@ int main() {
 	ConstructorAgent_Msg(&oil_msg, &env);
 	ConstructorAgent_Msg(&tire_msg, &env);
 	ConstructorAgent_Msg(&ins_msg, &env);
-	ConstructorOneShotBehaviour(&water_behaviour);
-	ConstructorOneShotBehaviour(&oil_behaviour);
-	ConstructorOneShotBehaviour(&tire_behaviour);
+	ConstructorCyclicBehaviour(&water_behaviour);
+	ConstructorCyclicBehaviour(&oil_behaviour);
+	ConstructorCyclicBehaviour(&tire_behaviour);
 	ConstructorCyclicBehaviour(&ins_behaviour);
 
 	//Initializing the Agents and the Platform.
@@ -258,7 +262,27 @@ int main() {
 	
 	AP.boot(&AP);
 
-	taskDelay(10000);
+	time_t currentTime;
+	time_t elapsedTime;
+
+	 // Calculate the start time
+
+	while (1) {
+		currentTime = time(NULL); 
+		elapsedTime = currentTime - startTimeInSeconds;
+		
+		if (elapsedTime>20) {
+//			printf("Program has run for 1 minute. Stopping the program.\n");
+			break; // Exit the loop after 1 minute
+		}
+
+//		printf("Program running. Time elapsed: %d seconds.\n", elapsedTime);
+		
+		// Add a delay using the system tick rate
+	}
+
+//	for(;;);
+//	taskDelay(40000);
 	// Start the scheduler so the created tasks start executing.
 
 	

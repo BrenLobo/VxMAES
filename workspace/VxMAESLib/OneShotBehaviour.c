@@ -86,7 +86,7 @@ void executeFunctionOSB(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 			Behaviour->failure_recovery(Behaviour, taskParam);
 		}
 	} while (!Behaviour->done(Behaviour, taskParam));
-	Behaviour->msg->suspend(Behaviour->msg, Behaviour->msg->get_sender(Behaviour->msg));
+//	Behaviour->msg->suspend(Behaviour->msg, Behaviour->msg->get_sender(Behaviour->msg));
 };
 
 /**
