@@ -24,7 +24,7 @@ Agent_Msg msgperson1, msgperson2, msgperson3;
 /**********************************************/
 void person1setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->Agent_Msg(Behaviour->msg);
-	char* info_persona1= "Mi ";
+	char* info_persona1= "Mi";
 	Behaviour->msg->add_receiver(Behaviour->msg, Person2.AID(&Person2));
 	Behaviour->msg->set_msg_content(Behaviour->msg, info_persona1);
 };
@@ -32,14 +32,14 @@ void person1setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 void person2setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->Agent_Msg(Behaviour->msg);
 	Behaviour->msg->add_receiver(Behaviour->msg, Person3.AID(&Person3));
-	char* info_persona2= "nombre es ";
+	char* info_persona2= " nombre es ";
 	Behaviour->msg->set_msg_content(Behaviour->msg, info_persona2);
 };
 
 void person3setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->Agent_Msg(Behaviour->msg);
 	Behaviour->msg->add_receiver(Behaviour->msg, Person1.AID(&Person1));
-	char* info_persona3 = "Brenda ";
+	char* info_persona3 = " Brenda.";
 	Behaviour->msg->set_msg_content(Behaviour->msg, info_persona3);
 };
 
@@ -48,13 +48,8 @@ void person3setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 /**********************************************/
 void persona1action(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
-	printf("\n Agente en ejecucion: ");
-	printf(informacion.agent_name);
-	char* msg_content = Behaviour->msg->get_msg_content(Behaviour->msg);
-	char contenidoTel[100]="";
-	strncat_s(contenidoTel, 100, msg_content, 3);
-	Behaviour->msg->set_msg_content(Behaviour->msg, (char*)contenidoTel);
-	printf("\nEste es el mensaje de %s: %s\n", informacion.agent_name, contenidoTel);
+	printf("\n Agente en ejecucion: %s", informacion.agent_name);
+	printf("\nEste es el mensaje de %s: %s\n", informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
 	Behaviour->msg->sendAll(Behaviour->msg);
 
 };
@@ -68,9 +63,11 @@ void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	char* msg_content = Behaviour->msg->get_msg_content(Behaviour->msg);
 	Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);
 	char* contenidoTel= Behaviour->msg->get_msg_content(Behaviour->msg);
-	strncat_s(contenidoTel, 100, msg_content, 19);
-	Behaviour->msg->set_msg_content(Behaviour->msg, contenidoTel);
-	printf("\nEste es el mensaje de %s: %s\n",informacion.agent_name, contenidoTel);
+	char contenido[50]="";
+	strncat_s(contenido, 50, contenidoTel, 13);
+	strncat_s(contenido, 50, msg_content, 10);
+	Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);
+	printf("\nEste es el mensaje de %s: %s\n",informacion.agent_name, contenido);
 	Behaviour->msg->sendAll(Behaviour->msg);
 
 };
@@ -124,9 +121,9 @@ int main() {
 	TASK_ID rtpInfo=taskIdSelf();
 	
 	//Initializing the Agents and the Platform.
-	Person1.Iniciador(&Person1, "Persona 1", 103, 50);
-	Person2.Iniciador(&Person2, "Persona 2", 102, 50);
-	Person3.Iniciador(&Person3, "Persona 3", 101, 50);
+	Person1.Iniciador(&Person1, "Persona 1", 105, 200);
+	Person2.Iniciador(&Person2, "Persona 2", 104, 200);
+	Person3.Iniciador(&Person3, "Persona 3", 103, 200);
 	APTelephone.Agent_Platform(&APTelephone, "AP Telephone",rtpInfo);
 
 	//Registering the Agents and their respective behaviour into the Platform
@@ -139,7 +136,7 @@ int main() {
 	//Platform Init
 	APTelephone.boot(&APTelephone);
 	
-	taskDelay(20);
+	taskDelay(6000);
 	return 0;
 
 }

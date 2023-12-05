@@ -39,5 +39,6 @@
 #define MAESmaxPriority 100 			   // The Higher priority for application      
 #define MAESminStacksize 50 			   // Minimum stack size
 #define MAXmsgLength 100				   // Maximum Message Lenght (bytes)
+#define ONE_MINUTE_IN_TICKS (sysClkRateGet() * 60)
 
 #endif /* VXMAESCONFIG_H_ */
