@@ -24,7 +24,7 @@ Agent_Msg msgperson1, msgperson2, msgperson3;
 /**********************************************/
 void person1setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->Agent_Msg(Behaviour->msg);
-	char* info_persona1= "Mi";
+	char* info_persona1= "This";
 	Behaviour->msg->add_receiver(Behaviour->msg, Person2.AID(&Person2));
 	Behaviour->msg->set_msg_content(Behaviour->msg, info_persona1);
 };
@@ -32,14 +32,14 @@ void person1setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 void person2setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->Agent_Msg(Behaviour->msg);
 	Behaviour->msg->add_receiver(Behaviour->msg, Person3.AID(&Person3));
-	char* info_persona2= " nombre es ";
+	char* info_persona2= " is the ";
 	Behaviour->msg->set_msg_content(Behaviour->msg, info_persona2);
 };
 
 void person3setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->Agent_Msg(Behaviour->msg);
 	Behaviour->msg->add_receiver(Behaviour->msg, Person1.AID(&Person1));
-	char* info_persona3 = " Brenda.";
+	char* info_persona3 = "message.";
 	Behaviour->msg->set_msg_content(Behaviour->msg, info_persona3);
 };
 
@@ -103,6 +103,7 @@ void phonePerson3(MAESArgument taskParam) {
 /**********************************************/
 int main() {
 	printf("------Telephone Game APP ------ \n");
+	int startTick= tickGet();
 	
 	//Constructors for each initialized class
 	ConstructorAgente(&Person1);
@@ -136,7 +137,15 @@ int main() {
 	//Platform Init
 	APTelephone.boot(&APTelephone);
 	
-	taskDelay(6000);
+	while(1){
+		int actual_tick=tickGet();
+		
+		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)){
+			printf("Brenda aca");
+			break;
+		}
+	}
+	
 	return 0;
 
 }

@@ -39,7 +39,6 @@ CyclicBehaviour ins_behaviour, oil_behaviour, tire_behaviour,water_behaviour;
 Agent_Msg water_msg, oil_msg, tire_msg, ins_msg;
 bootable water_pass, oil_pass, tire_pass,*data;
 char content[80];
-MAESArgument nose;//revisar
 float min, max, value;
 
 /**********************************************/
@@ -260,21 +259,15 @@ int main() {
 	
 	AP.boot(&AP);
 
-//	int startTick= tickGet();
-//	
-		
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)*3){
-			printf("Brenda aca");
+		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)){
+			printf("\n Program execution: 1 min.\n");
 			break;
 		}
 	}
 	
-
-//	for(;;);
-//	taskDelay(20000);
 	// Start the scheduler so the created tasks start executing.
 
 	
