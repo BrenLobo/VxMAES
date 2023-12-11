@@ -17,6 +17,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <sysLib.h>
+#include <semLib.h>
 #include "VxMAESconfig.h"
 
 
@@ -315,7 +316,7 @@ struct CyclicBehaviour {
 	Agent_Msg* msg;
 
 	//Methods
-	void (* action)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
+	void (*action)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
 	void (*setup)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
 	bool (*done)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
 	bool (*failure_detection)(CyclicBehaviour* Behaviour, MAESArgument taskParam);

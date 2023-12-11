@@ -139,11 +139,11 @@ void Verification_SysAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) 
 			if ((water_pass.pass == true) && (oil_pass.pass == true) && (tire_pass.pass == true)) {
 				printf("\n  Verificacion del sistema completado   \n");
 				printf("\n........Inicializando arranque sistema2........\n");
-				AP.agent_wait(&AP, 500);
+//				AP.agent_wait(&AP,500);
 				break;
 			} else {
 				printf("\n-------------Adjust Systems ---------------\n");
-				AP.agent_wait(&AP, 500);
+//				AP.agent_wait(&AP, 500);
 				break;
 			}
 		} 

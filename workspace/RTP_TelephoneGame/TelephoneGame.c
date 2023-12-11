@@ -18,6 +18,9 @@ Agent_Platform APTelephone;
 sysVars env;
 OneShotBehaviour BehaviourP1, BehaviourP2, BehaviourP3;
 Agent_Msg msgperson1, msgperson2, msgperson3;
+SEM_ID    mySemMId; 
+
+  
 
 /**********************************************/
 /*    Setup functions related to each agent   */
@@ -67,7 +70,7 @@ void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	strncat_s(contenido, 50, contenidoTel, 13);
 	strncat_s(contenido, 50, msg_content, 10);
 	Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);
-	printf("\nEste es el mensaje de %s: %s\n",informacion.agent_name, contenido);
+	printf("\nEste es el mensaje de %s: %s\n",informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
 	Behaviour->msg->sendAll(Behaviour->msg);
 
 };
@@ -104,7 +107,6 @@ void phonePerson3(MAESArgument taskParam) {
 int main() {
 	printf("------Telephone Game APP ------ \n");
 	int startTick= tickGet();
-	
 	//Constructors for each initialized class
 	ConstructorAgente(&Person1);
 	ConstructorAgente(&Person2);

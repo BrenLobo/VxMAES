@@ -36,7 +36,7 @@
 #define MAX_RECEIVERS AGENT_LIST_SIZE - 1  // Maximum receivers available for any agent
 #define BEHAVIOUR_LIST_SIZE 8			   // Behaviour list size
 #define ORGANIZATIONS_SIZE 16			   // Maximum Members by Organization
-#define MAESmaxPriority 100 			   // The Higher priority for application      
+#define MAESmaxPriority 101 			   // The Higher priority for application      
 #define MAESminStacksize 50 			   // Minimum stack size
 #define MAXmsgLength 100				   // Maximum Message Lenght (bytes)
 #define ONE_MINUTE_IN_TICKS (sysClkRateGet() * 60)
