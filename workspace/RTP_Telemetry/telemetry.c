@@ -6,10 +6,11 @@
  */
 
 
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "CMAES.h"
+#include <vxWorks.h>
+#include "VxMAES.h"
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>  
 
 
 /*Enums and structs*/
@@ -23,7 +24,7 @@ typedef enum meas_type
 typedef struct logger_info
 {
 	meas_type type;
-	UBaseType_t rate;
+	MAESTickType_t rate;
 }logger_info;
 
 
@@ -35,17 +36,17 @@ sysVars env;
 CyclicBehaviour CurrentBehaviour,VoltageBehaviour,TemperatureBehaviour, genBehaviour;
 Agent_Msg msg_current,msg_voltage,msg_temperature, msg_gen;
 logger_info log_current, log_voltage, log_temperature, *info, *infox;
-portFLOAT min, max, value;
+double min, max, value;
 char response[50];
 
 
 //Functions related to the Logger Action Behaviour//
 
-void loggerAction(CyclicBehaviour* Behaviour,void* pvParameters) {
-	info= (logger_info*)pvParameters;
+void loggerAction(CyclicBehaviour* Behaviour,MAESArgument taskParam) {
+	info= (logger_info*)taskParam;
 	Behaviour->msg->set_msg_content(Behaviour->msg, (char*)info->type);
-	Behaviour->msg->send(Behaviour->msg, measurement.AID(&measurement), portMAX_DELAY);
-	Behaviour->msg->receive(Behaviour->msg,portMAX_DELAY);
+	Behaviour->msg->sendX(Behaviour->msg, measurement.AID(&measurement), WAIT_FOREVER);
+	Behaviour->msg->receive(Behaviour->msg,WAIT_FOREVER);
 
 	/*Logging*/
 	printf("%s\n", Behaviour->msg->get_msg_content(Behaviour->msg));
@@ -53,40 +54,41 @@ void loggerAction(CyclicBehaviour* Behaviour,void* pvParameters) {
 };
 
 //Current Logger Wrapper:
-void Currentlogger(void* pvParameters) {
+void Currentlogger(MAESArgument taskParam) {
 	CurrentBehaviour.msg = &msg_current;
 	CurrentBehaviour.msg->Agent_Msg(CurrentBehaviour.msg);
 	CurrentBehaviour.action = &loggerAction;
-	CurrentBehaviour.execute(&CurrentBehaviour, pvParameters);
+	CurrentBehaviour.execute(&CurrentBehaviour, taskParam);
 };
 
 //Voltage Logger Wrapper:
-void Voltagelogger(void* pvParameters) {
+void Voltagelogger(MAESArgument taskParam) {
 	VoltageBehaviour.msg = &msg_voltage;
 	VoltageBehaviour.msg->Agent_Msg(VoltageBehaviour.msg);
 	VoltageBehaviour.action = &loggerAction;
-	VoltageBehaviour.execute(&VoltageBehaviour, pvParameters);
+	VoltageBehaviour.execute(&VoltageBehaviour, taskParam);
 };
 
 //Temperature Logger Wrapper:
-void Temperaturelogger(void* pvParameters) {
+void Temperaturelogger(MAESArgument taskParam) {
 	TemperatureBehaviour.msg = &msg_temperature;
 	TemperatureBehaviour.msg->Agent_Msg(TemperatureBehaviour.msg);
 	TemperatureBehaviour.action = &loggerAction;
-	TemperatureBehaviour.execute(&TemperatureBehaviour, pvParameters);
+	TemperatureBehaviour.execute(&TemperatureBehaviour, taskParam);
 };
 
 
 
 //Functions related to the Generator Behaviour//
 
-void genAction(CyclicBehaviour* Behaviour, void* pvParameters) {
+void genAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = Platform.get_Agent_description(Platform.get_running_agent(&Platform));
 	printf("\n Agente en ejecucion: ");
 	printf(informacion.agent_name);
-	Behaviour->msg->receive(Behaviour->msg,portMAX_DELAY);
+	Behaviour->msg->receive(Behaviour->msg,WAIT_FOREVER);
+	srand((unsigned int)time(NULL));
 	int i = (int)Behaviour->msg->get_msg_content(Behaviour->msg);
-	switch ((int)Behaviour->msg->get_msg_content(Behaviour->msg))
+	switch (i)
 	{
 	case CURRENT:
 		min = 0.1; //mA
@@ -116,21 +118,21 @@ void genAction(CyclicBehaviour* Behaviour, void* pvParameters) {
 	}
 
 	Behaviour->msg->set_msg_content(Behaviour->msg,response);
-	Behaviour->msg->send(Behaviour->msg, Behaviour->msg->get_sender(Behaviour->msg), portMAX_DELAY);
+	Behaviour->msg->sendX(Behaviour->msg, Behaviour->msg->get_sender(Behaviour->msg), WAIT_FOREVER);
 };
 
 //Generator Wrapper
-void gen(void* pvParameters) {
+void gen(MAESArgument taskParam) {
 	genBehaviour.msg = &msg_gen;
 	genBehaviour.msg->Agent_Msg(genBehaviour.msg);
 	genBehaviour.action = &genAction;
-	genBehaviour.execute(&genBehaviour, &pvParameters);
+	genBehaviour.execute(&genBehaviour, taskParam);
 };
 
 //Main
-int telemetry() {
+int main() {
 	printf("------Telemetry------ \n");
-
+	int startTick= tickGet();
 	//Rates and types for each logger.
 	log_current.rate = 500;
 	log_voltage.rate = 1000;
@@ -160,21 +162,28 @@ int telemetry() {
 	logger_voltage.Iniciador(&logger_voltage, "Voltage Logger", 2, 10);
 	logger_temperature.Iniciador(&logger_temperature, "Temperature Logger", 1, 10);
 	measurement.Iniciador(&measurement, "Measure", 3, 10);
-	Platform.Agent_Platform(&Platform, "telemetry_platform");
+	
+	TASK_ID rtpInfo=taskIdSelf();
+	Platform.Agent_Platform(&Platform, "telemetry_platform",rtpInfo);
 
 	//Registering the Agents and their respective behaviour into the Platform
-	Platform.agent_initConParam(&Platform,&logger_current, &Currentlogger, (void*)&log_current);
-	Platform.agent_initConParam(&Platform, &logger_voltage, &Voltagelogger, (void*)&log_voltage);
-	Platform.agent_initConParam(&Platform, &logger_temperature, &Temperaturelogger, (void*)&log_temperature);
+	Platform.agent_initConParam(&Platform,&logger_current, &Currentlogger, (MAESArgument)&log_current);
+	Platform.agent_initConParam(&Platform, &logger_voltage, &Voltagelogger, (MAESArgument)&log_voltage);
+	Platform.agent_initConParam(&Platform, &logger_temperature, &Temperaturelogger, (MAESArgument)&log_temperature);
 	Platform.agent_init(&Platform, &measurement, &gen);
 	Platform.boot(&Platform);
 	printf("CMAES booted successfully \n");
 	printf("Initiating APP\n\n");
 
 	// Start the scheduler so the created tasks start executing.
-	vTaskStartScheduler(); //Might have to be changed because CSP Library takes control of the FreeRTOS scheduler
-
-	for (;;);
+	while(1){
+		int actual_tick=tickGet();
+		
+		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)){
+			printf("\n Program execution: 1 min.\n");
+			break;
+		}
+	}
 	return 0;
 }
 
