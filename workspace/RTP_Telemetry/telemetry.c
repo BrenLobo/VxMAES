@@ -158,10 +158,10 @@ int main() {
 	ConstructorCyclicBehaviour(&genBehaviour);
 
 	//Initializing the Agents and the Platform.
-	logger_current.Iniciador(&logger_current, "Current Logger", 3, 10);
-	logger_voltage.Iniciador(&logger_voltage, "Voltage Logger", 2, 10);
-	logger_temperature.Iniciador(&logger_temperature, "Temperature Logger", 1, 10);
-	measurement.Iniciador(&measurement, "Measure", 3, 10);
+	logger_current.Iniciador(&logger_current, "Current Logger", 105, 100);
+	logger_voltage.Iniciador(&logger_voltage, "Voltage Logger", 104, 100);
+	logger_temperature.Iniciador(&logger_temperature, "Temperature Logger", 103, 100);
+	measurement.Iniciador(&measurement, "Measure", 102, 10);
 	
 	TASK_ID rtpInfo=taskIdSelf();
 	Platform.Agent_Platform(&Platform, "telemetry_platform",rtpInfo);

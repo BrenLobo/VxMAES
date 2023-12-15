@@ -48,6 +48,7 @@ float min, max, value;
 void meaSetup(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->Agent_Msg(Behaviour->msg);
 	Behaviour->msg->add_receiver(Behaviour->msg, inspector.AID(&inspector));
+	taskDelay(100);
 }
 
 // action
@@ -258,7 +259,8 @@ int main() {
 	printf("Initiating APP\n\n");
 	
 	AP.boot(&AP);
-
+	
+	
 	while(1){
 		int actual_tick=tickGet();
 		

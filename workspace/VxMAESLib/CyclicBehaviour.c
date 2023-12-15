@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+
 /**
  * Cyclic Action Function: This function is a wrapper that contains the core action of the agent's behavior. This function must be redefined in the main application.
  * 		 	 Inputs: The behavior instance itself and parameters (in case they are needed).
