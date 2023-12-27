@@ -16,7 +16,7 @@
  * 		 	 Inputs: The behavior instance itself and parameters (in case they are needed).
  *		 	Outputs: None.
  */
-void actionFunction(CyclicBehaviour* Behaviour, MAESArgument taskParam, MAESArgument semaphoreX) {
+void actionFunction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	// Empty
 };
 
@@ -77,14 +77,14 @@ void failure_recoveryFunction(CyclicBehaviour* Behaviour, MAESArgument taskParam
  *			 Inputs: The behavior instance itself and parameters (in case they are needed).
  * 			Outputs: None.
  */
-void executeFunction(CyclicBehaviour* Behaviour, MAESArgument taskParam,MAESArgument semaphoreX) {
+void executeFunction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->setup(Behaviour, taskParam);
 //	SEM_ID mysem =semOpen("Semaphore",SEM_TYPE_COUNTING,2,SEM_Q_PRIORITY,OM_CREATE,0); 
 	
 	do
 	{
 //		semTake(mysem,WAIT_FOREVER);
-		Behaviour->action(Behaviour, taskParam,semaphoreX);
+		Behaviour->action(Behaviour, taskParam);
 		if (Behaviour->failure_detection(Behaviour, taskParam))
 		{
 			Behaviour->failure_identification(Behaviour, taskParam);

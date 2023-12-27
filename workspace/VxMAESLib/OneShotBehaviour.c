@@ -15,7 +15,7 @@
  * 		 	 Inputs: The behavior instance itself and parameters (in case they are needed).
  *		 	Outputs: None.
  */
-void actionFunctionOSB(OneShotBehaviour* Behaviour, MAESArgument taskParam,MAESArgument semaphoreX) {
+void actionFunctionOSB(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	//Empty
 };
 
@@ -75,13 +75,13 @@ void failure_recoveryFunctionOSB(OneShotBehaviour* Behaviour, MAESArgument taskP
  * 			 Inputs: The behavior instance itself and parameters (in case they are needed).
  * 			Outputs: None.
  */ 
-void executeFunctionOSB(OneShotBehaviour* Behaviour, MAESArgument taskParam,MAESArgument semaphoreX) {
+void executeFunctionOSB(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->setup(Behaviour,taskParam);
 //	SEM_ID mysem =semOpen("Semaphore",SEM_TYPE_COUNTING,3,SEM_Q_PRIORITY,OM_CREATE,0); 
 	do
 	{
 //		semTake(mysem,WAIT_FOREVER);
-		Behaviour->action(Behaviour, taskParam,semaphoreX);
+		Behaviour->action(Behaviour, taskParam);
 		if (Behaviour->failure_detection(Behaviour, taskParam))
 		{
 			Behaviour->failure_identification(Behaviour, taskParam);
