@@ -16,10 +16,9 @@
  * 		 Inputs: Parameters passed into the AMS Task Function.
  * 		Outputs: None.
  */
-void AMS_taskFunction(MAESArgument taskParam,MAESArgument semaphoreY) {
+void AMS_taskFunction(MAESArgument taskParam) {
 	AMSparameter* amsParameters = (AMSparameter*)taskParam;
 	USER_DEF_COND* cond = amsParameters->cond;
-	SEM_ID semaphoreX = (SEM_ID)semaphoreY;
 	Agent_Platform* services = amsParameters->services;
 	sysVars* ptrenvi = amsParameters->ptr_env;	
 	Agent_Msg msg;
@@ -28,7 +27,7 @@ void AMS_taskFunction(MAESArgument taskParam,MAESArgument semaphoreY) {
 	MAESUBaseType_t error_msg = 0;
 	for (;;)
 	{
-		msg.receive(&msg, WAIT_FOREVER,semaphoreX);
+		msg.receive(&msg, WAIT_FOREVER);
 		if (msg.get_msg_type(&msg) == REQUEST)
 		{
 			if (strcmp((const char*)msg.get_msg_content(&msg), "KILL") == 0)
@@ -49,7 +48,7 @@ void AMS_taskFunction(MAESArgument taskParam,MAESArgument semaphoreY) {
 				{
 					msg.set_msg_type(&msg, REFUSE);
 				}
-				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT,semaphoreX);
+				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT);
 			} //KILL Case
 
 			else if (strcmp((const char*)msg.get_msg_content(&msg),"REGISTER") == 0)
@@ -70,7 +69,7 @@ void AMS_taskFunction(MAESArgument taskParam,MAESArgument semaphoreY) {
 				{
 					msg.set_msg_type(&msg, REFUSE);
 				}
-				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT,semaphoreX);
+				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT);
 			} //REGISTER Case
 
 			else if (strcmp((const char*)msg.get_msg_content(&msg), "DEREGISTER") == 0)
@@ -91,7 +90,7 @@ void AMS_taskFunction(MAESArgument taskParam,MAESArgument semaphoreY) {
 				{
 					msg.set_msg_type(&msg, REFUSE);
 				}
-				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT,semaphoreX);
+				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT);
 			} //DEREGISTER Case
 
 			else if (strcmp((const char*)msg.get_msg_content(&msg), "SUSPEND") == 0)
@@ -112,7 +111,7 @@ void AMS_taskFunction(MAESArgument taskParam,MAESArgument semaphoreY) {
 				{
 					msg.set_msg_type(&msg, REFUSE);
 				}
-				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT,semaphoreX);
+				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT);
 			} //SUSPEND Case
 
 			else if (strcmp((const char*)msg.get_msg_content(&msg), "RESUME") == 0)
@@ -133,7 +132,7 @@ void AMS_taskFunction(MAESArgument taskParam,MAESArgument semaphoreY) {
 				{
 					msg.set_msg_type(&msg, REFUSE);
 				}
-				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT,semaphoreX);
+				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT);
 			} //RESUME Case
 
 			else if (strcmp((const char*)msg.get_msg_content(&msg), "RESTART") == 0)
@@ -146,19 +145,19 @@ void AMS_taskFunction(MAESArgument taskParam,MAESArgument semaphoreY) {
 				{
 					msg.set_msg_type(&msg, REFUSE);
 				}
-				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT,semaphoreX);
+				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT);
 			} //RESTART Case
 
 			else
 			{
 				msg.set_msg_type(&msg, NOT_UNDERSTOOD);
-				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT,semaphoreX);
+				msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT);
 			}
 		} //end if
 		else
 		{
 			msg.set_msg_type(&msg, NOT_UNDERSTOOD);
-			msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT,semaphoreX);
+			msg.sendX(&msg, msg.get_sender(&msg), NO_WAIT);
 		}
 	} // end while
 };
@@ -207,7 +206,7 @@ void Agent_PlatformWithCondFunction(Agent_Platform* platform, char* name, USER_D
  * 		     Inputs: The Platform instance itself.
  *			Outputs: Bool variable indicating if the boot was successful.
  */
-bool bootFunction(Agent_Platform* platform,SEM_ID semaphoreX) {
+bool bootFunction(Agent_Platform* platform) {
 	if (taskIdSelf() == platform->description.RTP_info)
 	{
 		
@@ -219,7 +218,7 @@ bool bootFunction(Agent_Platform* platform,SEM_ID semaphoreX) {
 		platform->parameter->services = platform;
 		platform->parameter->ptr_env = &env;
 		platform->agentAMS.resources.stackSize = MAESminStacksize;
-		platform->agentAMS.agent.aid=taskCreate(platform->agentAMS.agent.agent_name,MAESmaxPriority,0, platform->agentAMS.resources.stackSize,(MAESTaskFunction_t)AMS_taskFunction, (MAESArgument)platform->parameter,(MAESArgument)semaphoreX,0,0,0,0,0,0,0,0);
+		platform->agentAMS.agent.aid=taskCreate(platform->agentAMS.agent.agent_name,MAESmaxPriority,0, platform->agentAMS.resources.stackSize,(MAESTaskFunction_t)AMS_taskFunction, (MAESArgument)platform->parameter,0,0,0,0,0,0,0,0,0);
 		platform->description.AMS_AID = platform->agentAMS.agent.aid;
 		env.set_TaskEnv(&env,platform->agentAMS.agent.aid, &platform->agentAMS);
 		if (platform->agentAMS.agent.aid != NULL)
@@ -256,7 +255,7 @@ bool bootFunction(Agent_Platform* platform,SEM_ID semaphoreX) {
  * 			 Inputs: The Platform instance itself, the agent and the agent's behavior.
  * 			Outputs: None.
 */
-void agent_initFunction(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour, SEM_ID semaphoreX) {
+void agent_initFunction(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour) {
 	if (taskIdSelf() == platform->description.RTP_info)
 	{
 		// Mailbox
@@ -264,7 +263,7 @@ void agent_initFunction(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunc
 		// Task
 		agent->resources.function = behaviour;
 		agent->resources.taskParameters = NULL;
-		agent->agent.aid= taskCreate(agent->agent.agent_name,agent->agent.priority,0,agent->resources.stackSize,agent->resources.function, 0, (MAESArgument)semaphoreX,0,0,0,0,0,0,0,0);//revisar
+		agent->agent.aid= taskCreate(agent->agent.agent_name,agent->agent.priority,0,agent->resources.stackSize,agent->resources.function, 0, 0,0,0,0,0,0,0,0,0);//revisar
 		env.set_TaskEnv(&env,agent->agent.aid, agent);
 		
 	}
@@ -276,7 +275,7 @@ void agent_initFunction(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunc
  * 			 Inputs: The Platform instance itself, the agent, the agent's behavior and its input parameters.
  * 			Outputs: None.
  */
-void agent_initConParamFunction(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour, MAESArgument taskParam,SEM_ID semaphoreX) {
+void agent_initConParamFunction(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour, MAESArgument taskParam) {
 	if (taskIdSelf() == platform->description.RTP_info)
 	{
 		// Mailbox
@@ -284,7 +283,7 @@ void agent_initConParamFunction(Agent_Platform* platform, MAESAgent* agent, MAES
 		// Task
 		agent->resources.function = behaviour;
 		agent->resources.taskParameters = taskParam;
-		agent->agent.aid= taskCreate(agent->agent.agent_name,agent->agent.priority,0,agent->resources.stackSize, agent->resources.function,taskParam, (MAESArgument)semaphoreX,0,0,0,0,0,0,0,0);
+		agent->agent.aid= taskCreate(agent->agent.agent_name,agent->agent.priority,0,agent->resources.stackSize, behaviour,taskParam, 0,0,0,0,0,0,0,0,0);
 		env.set_TaskEnv(&env,agent->agent.aid, agent);
 	}
 };

@@ -48,32 +48,30 @@ void person3setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 /**********************************************/
 /*   Action function related to the Person 1  */
 /**********************************************/
-void persona1action(OneShotBehaviour* Behaviour, MAESArgument taskParam, MAESArgument sem) {
-	SEM_ID mysem=(SEM_ID)sem;
+void persona1action(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
 	printf("\n Agente en ejecucion: %s", informacion.agent_name);
 	printf("\nEste es el mensaje de %s: %s\n", informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
-	Behaviour->msg->sendAll(Behaviour->msg,mysem);
+	Behaviour->msg->sendAll(Behaviour->msg);
 
 };
 
 /************************************************/
 /*Action function related to the Person 2 and 3 */
 /************************************************/
-void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam,MAESArgument sem) {
-	SEM_ID mysem=(SEM_ID)sem;
+void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
 	printf("\n Agente en ejecucion: %s\n",informacion.agent_name);
 	char* msg_content = Behaviour->msg->get_msg_content(Behaviour->msg);
-	Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER,mysem);
-	char contenido[30]="";
+	Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);
 	char* contenidoTel= Behaviour->msg->get_msg_content(Behaviour->msg);
+	char contenido[30]="";
 	strncat_s(contenido, 30, contenidoTel, 15);	
 	strncat_s(contenido, 30, msg_content, 15);
-	taskDelay(200);
+	taskDelay(100);
 	Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);	
 	printf("\nEste es el mensaje de %s: %s\n",informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
-	Behaviour->msg->sendAll(Behaviour->msg,mysem);
+	Behaviour->msg->sendAll(Behaviour->msg);
 
 };
 
@@ -81,25 +79,25 @@ void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam,MAESArgume
 /**********************************************/
 /*         Wrappers for each agent			  */
 /**********************************************/
-void phonePerson1(MAESArgument taskParam,MAESArgument sem) {
+void phonePerson1(MAESArgument taskParam) {
 	BehaviourP1.msg = &msgperson1;
 	BehaviourP1.setup = &person1setup;
 	BehaviourP1.action = &persona1action;
-	BehaviourP1.execute(&BehaviourP1, taskParam,sem);
+	BehaviourP1.execute(&BehaviourP1, taskParam);
 };
 
-void phonePerson2(MAESArgument taskParam,MAESArgument sem) {
+void phonePerson2(MAESArgument taskParam) {
 	BehaviourP2.msg = &msgperson2;
 	BehaviourP2.setup = &person2setup;
 	BehaviourP2.action = &personaction;
-	BehaviourP2.execute(&BehaviourP2, taskParam,sem);
+	BehaviourP2.execute(&BehaviourP2, taskParam);
  };
 
-void phonePerson3(MAESArgument taskParam,MAESArgument sem) {
+void phonePerson3(MAESArgument taskParam) {
 	BehaviourP3.msg = &msgperson3;
 	BehaviourP3.setup = &person3setup;
 	BehaviourP3.action = &personaction;
-	BehaviourP3.execute(&BehaviourP3, taskParam,sem);
+	BehaviourP3.execute(&BehaviourP3, taskParam);
 };
 
 
@@ -121,8 +119,7 @@ int main() {
 	ConstructorOneShotBehaviour(&BehaviourP1);
 	ConstructorOneShotBehaviour(&BehaviourP2);
 	ConstructorOneShotBehaviour(&BehaviourP3);
-//	SEM_ID mysemT =semOpen("SemaphoreB",SEM_TYPE_COUNTING,4,SEM_Q_PRIORITY,OM_CREATE,0);
-	SEM_ID mysemT = semMCreate(SEM_INVERSION_SAFE);
+	
 	//Defining the RPT task (change name in each RTP)
 	TASK_ID rtpInfo=taskIdSelf();
 	
@@ -133,14 +130,14 @@ int main() {
 	APTelephone.Agent_Platform(&APTelephone, "AP Telephone",rtpInfo);
 
 	//Registering the Agents and their respective behaviour into the Platform
-	APTelephone.agent_init(&APTelephone, &Person1, &phonePerson1,mysemT);
-	APTelephone.agent_init(&APTelephone, &Person2, &phonePerson2,mysemT);
-	APTelephone.agent_init(&APTelephone, &Person3, &phonePerson3,mysemT);
+	APTelephone.agent_init(&APTelephone, &Person1, &phonePerson1);
+	APTelephone.agent_init(&APTelephone, &Person2, &phonePerson2);
+	APTelephone.agent_init(&APTelephone, &Person3, &phonePerson3);
 	printf("VxMAES booted successfully \n");
 	printf("Initiating APP\n\n");
 	
 	//Platform Init
-	APTelephone.boot(&APTelephone,mysemT);
+	APTelephone.boot(&APTelephone);
 	
 	while(1){
 		int actual_tick=tickGet();
