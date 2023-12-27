@@ -18,6 +18,7 @@ Agent_Platform APTelephone;
 sysVars env;
 OneShotBehaviour BehaviourP1, BehaviourP2, BehaviourP3;
 Agent_Msg msgperson1, msgperson2, msgperson3;
+SEM_ID    mySemMId; 
 
   
 
@@ -66,9 +67,9 @@ void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);
 	char* contenidoTel= Behaviour->msg->get_msg_content(Behaviour->msg);
 	char contenido[30]="";
-	strncat_s(contenido, 30, contenidoTel, 15);	
-	strncat_s(contenido, 30, msg_content, 15);
-	taskDelay(100);
+	strncat_s(contenido, 30, contenidoTel, 14);	
+	strncat_s(contenido, 30, msg_content, 10);
+	taskDelay(50);
 	Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);	
 	printf("\nEste es el mensaje de %s: %s\n",informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
 	Behaviour->msg->sendAll(Behaviour->msg);
@@ -124,9 +125,9 @@ int main() {
 	TASK_ID rtpInfo=taskIdSelf();
 	
 	//Initializing the Agents and the Platform.
-	Person3.Iniciador(&Person3, "Persona 3", 102, 200);
-	Person2.Iniciador(&Person2, "Persona 2", 103, 200);
-	Person1.Iniciador(&Person1, "Persona 1", 104, 200);
+	Person1.Iniciador(&Person1, "Persona 1", 105, 200);
+	Person2.Iniciador(&Person2, "Persona 2", 104, 200);
+	Person3.Iniciador(&Person3, "Persona 3", 103, 200);
 	APTelephone.Agent_Platform(&APTelephone, "AP Telephone",rtpInfo);
 
 	//Registering the Agents and their respective behaviour into the Platform
@@ -142,7 +143,7 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(6*ONE_MINUTE_IN_TICKS)){
+		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)){
 			printf("Brenda aca");
 			break;
 		}

@@ -209,7 +209,6 @@ void Agent_PlatformWithCondFunction(Agent_Platform* platform, char* name, USER_D
 bool bootFunction(Agent_Platform* platform) {
 	if (taskIdSelf() == platform->description.RTP_info)
 	{
-		
 		ConstructorAgente(&platform->agentAMS);		
 		platform->agentAMS.Iniciador(&platform->agentAMS, "AMSAgent", MAESmaxPriority, 1024); //REVISAR tamano
 		platform->agentAMS.agent.mailbox_handle = msgQCreate(1,MAXmsgLength,MSG_Q_FIFO );
@@ -265,7 +264,6 @@ void agent_initFunction(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunc
 		agent->resources.taskParameters = NULL;
 		agent->agent.aid= taskCreate(agent->agent.agent_name,agent->agent.priority,0,agent->resources.stackSize,agent->resources.function, 0, 0,0,0,0,0,0,0,0,0);//revisar
 		env.set_TaskEnv(&env,agent->agent.aid, agent);
-		
 	}
 };
 
