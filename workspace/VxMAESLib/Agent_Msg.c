@@ -161,8 +161,8 @@ void refresh_listFunction(Agent_Msg* Message) {
  *		Outputs: The message type of the message or a no response error.
  */
 MSG_TYPE receiveFunction(Agent_Msg* Message, MAESTickType_t timeout) {
-	SEM_ID mysem =semOpen("Semaphore",SEM_TYPE_COUNTING,3,SEM_Q_PRIORITY,OM_CREATE,0);
-	semTake(mysem,WAIT_FOREVER);
+//	SEM_ID mysem =semOpen("Semaphore",SEM_TYPE_COUNTING,3,SEM_Q_PRIORITY,OM_CREATE,0);
+//	semTake(mysem,WAIT_FOREVER);
 	MsgObj msg;
 	ssize_t receivedBytes=msgQReceive(Message->get_mailbox(Message, Message->caller),(char*)&msg, MAXmsgLength, timeout);
 	if (receivedBytes>0){
@@ -171,7 +171,7 @@ MSG_TYPE receiveFunction(Agent_Msg* Message, MAESTickType_t timeout) {
 	}else{
 		return NO_RESPONSE;
 	}
-	semGive(mysem);
+//	semGive(mysem);
 };
 
 /**
@@ -180,7 +180,7 @@ MSG_TYPE receiveFunction(Agent_Msg* Message, MAESTickType_t timeout) {
  *		Outputs: An Error code indicating if the message was sent successfuLly.
  */
 ERROR_CODE sendXFunction(Agent_Msg* Message, Agent_AID aid_receiver, MAESTickType_t timeout) {
-	SEM_ID mysemT =semOpen("SemaphoreB",SEM_TYPE_COUNTING,1,SEM_Q_PRIORITY,OM_CREATE,0);
+	SEM_ID mysemT =semOpen("SemaphoreB",SEM_TYPE_COUNTING,2,SEM_Q_PRIORITY,OM_CREATE,0);
 	semTake(mysemT,WAIT_FOREVER);
 	Message->msg.target_agent = aid_receiver; 
 	Message->msg.sender_agent = Message->caller;

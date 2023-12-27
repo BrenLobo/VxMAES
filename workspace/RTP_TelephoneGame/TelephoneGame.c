@@ -67,10 +67,11 @@ void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);
 	char* contenidoTel= Behaviour->msg->get_msg_content(Behaviour->msg);
 	char contenido[30]="";
-	strncat_s(contenido, 30, contenidoTel, 14);	
+	strncat_s(contenido, 30, contenidoTel, 14);
+	taskDelay(20);
 	strncat_s(contenido, 30, msg_content, 10);
+	Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);
 	taskDelay(50);
-	Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);	
 	printf("\nEste es el mensaje de %s: %s\n",informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
 	Behaviour->msg->sendAll(Behaviour->msg);
 
