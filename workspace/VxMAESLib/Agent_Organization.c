@@ -423,16 +423,16 @@ MAESUBaseType_t get_sizeFunction(Agent_Organization* Organization) {
  * 			 		 the organization's password, the target agent and the timeout.
  * 			Outputs: The message type, indicating if the agent accepted or denied the invitation.
  */
-MSG_TYPE inviteFunction(Agent_Organization* Organization, Agent_Msg msg, MAESUBaseType_t password, Agent_AID target_agent, _Vx_ticks_t timeout) {
+MSG_TYPE inviteFunction(Agent_Organization* Organization, Agent_Msg msg, MAESUBaseType_t password, Agent_AID target_agent, _Vx_ticks_t timeout, SEM_ID semaphoreX) {
 	MAESAgent* caller = (MAESAgent*)Organization->ptr_env->get_taskEnv(Organization->ptr_env, taskIdSelf());
 
 	if (caller->agent.affiliation == OWNER || caller->agent.affiliation == ADMIN)
 	{
 		msg.set_msg_type(&msg,PROPOSE);
 		msg.set_msg_content(&msg,(char*)"Join Organization");
-		msg.sendX(&msg,target_agent, timeout);
+		msg.sendX(&msg,target_agent, timeout,semaphoreX);
 
-		msg.receive(&msg,timeout);
+		msg.receive(&msg,timeout,semaphoreX);
 
 		if (msg.get_msg_type(&msg) == ACCEPT_PROPOSAL)
 		{
