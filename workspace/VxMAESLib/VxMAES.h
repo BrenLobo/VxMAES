@@ -221,9 +221,9 @@ struct Agent_Msg {
 	ERROR_CODE (*remove_receiver)(Agent_Msg*,Agent_AID aid_receiver);
 	void (*clear_all_receiver)(Agent_Msg*);
 	void (*refresh_list)(Agent_Msg*);
-	MSG_TYPE (*receive)(Agent_Msg*,MAESTickType_t timeout);
-	ERROR_CODE (*sendX)(Agent_Msg*,Agent_AID aid_receiver, MAESTickType_t timeout);
-	ERROR_CODE (*sendAll)(Agent_Msg*);
+	MSG_TYPE (*receive)(Agent_Msg*,MAESTickType_t timeout,SEM_ID semaphoreX);
+	ERROR_CODE (*sendX)(Agent_Msg*,Agent_AID aid_receiver, MAESTickType_t timeout, SEM_ID semaphoreX);
+	ERROR_CODE (*sendAll)(Agent_Msg*, SEM_ID semaphoreX);
 	void (*set_msg_type)(Agent_Msg*,MSG_TYPE type);
 	void (*set_msg_content)(Agent_Msg*,char* body);
 	MsgObj* (*get_msg)(Agent_Msg*);
@@ -276,9 +276,9 @@ struct Agent_Platform {
 	//Methods
 	void (*Agent_Platform)(Agent_Platform* platform, char* name, Agent_AID rtpInfo);
 	void (*Agent_PlatformWithCond)(Agent_Platform* platform,  char* name, USER_DEF_COND* user_cond);
-	bool (*boot)(Agent_Platform* platform);
-	void (*agent_init)(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour);
-	void (*agent_initConParam)(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour, MAESArgument taskParam);
+	bool (*boot)(Agent_Platform* platform,SEM_ID semaphoreX);
+	void (*agent_init)(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour, SEM_ID semaphoreX);
+	void (*agent_initConParam)(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour, MAESArgument taskParam,SEM_ID semaphoreX);
 	bool (*agent_search)(Agent_Platform* platform, Agent_AID aid);
 	void (*agent_wait)(Agent_Platform* platform, MAESTickType_t ticks);
 	void (*agent_yield)(Agent_Platform* platform);
@@ -316,13 +316,13 @@ struct CyclicBehaviour {
 	Agent_Msg* msg;
 
 	//Methods
-	void (*action)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
+	void (*action)(CyclicBehaviour* Behaviour, MAESArgument taskParam,MAESArgument semaphoreX);
 	void (*setup)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
 	bool (*done)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
 	bool (*failure_detection)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
 	void (*failure_identification)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
 	void (*failure_recovery)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
-	void (*execute)(CyclicBehaviour* Behaviour, MAESArgument taskParam);
+	void (*execute)(CyclicBehaviour* Behaviour, MAESArgument taskParam,MAESArgument semaphoreX);
 };
 
 //######################################################//
@@ -337,13 +337,13 @@ struct OneShotBehaviour {
 	Agent_Msg* msg;
 
 	//Methods
-	void (*action)(OneShotBehaviour* Behaviour, MAESArgument taskParam);
+	void (*action)(OneShotBehaviour* Behaviour, MAESArgument taskParam,MAESArgument semaphoreX);
 	void (*setup)(OneShotBehaviour* Behaviour, MAESArgument taskParam);
 	bool (*done)(OneShotBehaviour* Behaviour, MAESArgument taskParam);
 	bool (*failure_detection)(OneShotBehaviour* Behaviour, MAESArgument taskParam);
 	void (*failure_identification)(OneShotBehaviour* Behaviour, MAESArgument taskParam);
 	void (*failure_recovery)(OneShotBehaviour* Behaviour, MAESArgument taskParam);
-	void (*execute)(OneShotBehaviour* Behaviour, MAESArgument taskParam);
+	void (*execute)(OneShotBehaviour* Behaviour, MAESArgument taskParam,MAESArgument semaphoreX);
 };
 
 //######################################################//
@@ -377,7 +377,7 @@ struct Agent_Organization {
 	org_info (*get_info)(Agent_Organization* Organization);
 	MAESUBaseType_t (*get_size)(Agent_Organization* Organization);
 	MSG_TYPE (*invite)(Agent_Organization* Organization, Agent_Msg msg, 
-			MAESUBaseType_t password, Agent_AID target_agent, _Vx_ticks_t timeout);
+			MAESUBaseType_t password, Agent_AID target_agent, _Vx_ticks_t timeout,SEM_ID semaphoreX);
 };
 
 /****************************************************** *
