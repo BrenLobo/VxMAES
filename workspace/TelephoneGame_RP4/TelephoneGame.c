@@ -8,11 +8,6 @@
 #include <vxWorks.h>
 #include "VxMAES.h"
 #include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-
-
 
 /**********************************************/
 /* 		  Defining the app's variables.       */
@@ -59,6 +54,7 @@ void persona1action(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	printf("\n Agente en ejecucion: %s", informacion.agent_name);
 	printf("\nEste es el mensaje de %s: %s\n", informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
 	Behaviour->msg->sendAll(Behaviour->msg);
+
 };
 
 /************************************************/
@@ -68,35 +64,17 @@ void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
 	printf("\n Agente en ejecucion: %s\n",informacion.agent_name);
 	char* msg_content = Behaviour->msg->get_msg_content(Behaviour->msg);
-	size_t len_message = strlen(msg_content);
-	printf("Mensaje propio: %s del agente: %s, tamanio: %d\n" , msg_content, informacion.agent_name, len_message);
-	
 	Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);
 	char* contenidoTel= Behaviour->msg->get_msg_content(Behaviour->msg);
-	size_t len_cont_tel = strlen(contenidoTel);
-	printf("Mensaje recibido: %s del agente: %s, tamanio: %d\n" , contenidoTel, informacion.agent_name, len_cont_tel);
-		
-	char *contenido = (char *)malloc(len_cont_tel+len_message+1);
-	
-	printf("tamanio del contenido: %zu\n", sizeof(contenido));
-	
-	if (contenido != NULL){
-		//Copy to contenido all the existing string of contenidoTel
-		strcpy(contenido,contenidoTel);
-		//Concatenate contenido, wich already has the total strings from the previuos message to msg_conten, that is the new message
-		strcat(contenido,msg_content);
-		printf("\t>>Se concateno a el char contenido lo que esta en el telefono: %s\n\n", contenido);
-	
-		Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);
-		
-		Behaviour->msg->sendAll(Behaviour->msg);
-		taskSuspend(informacion.aid);
+	char contenido[30]="";
+	strncat_s(contenido, 30, contenidoTel, 14);
+//	taskDelay(20);
+	strncat_s(contenido, 30, msg_content, 10);
+	Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);
+	taskDelay(50);
+	printf("\nEste es el mensaje de %s: %s\n",informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
+	Behaviour->msg->sendAll(Behaviour->msg);
 
-		free(contenido);
-	}else{
-		printf("Allocation failed");
-	}
-	
 };
 
 
@@ -130,7 +108,6 @@ void phonePerson3(MAESArgument taskParam) {
 /**********************************************/
 int main() {
 	printf("------Telephone Game APP ------ \n");
-	
 	int startTick= tickGet();
 	//Constructors for each initialized class
 	ConstructorAgente(&Person1);
@@ -167,8 +144,8 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(3*ONE_MINUTE_IN_TICKS)){
-			printf("Fin de la Ejecucion");
+		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)){
+			printf("Brenda aca");
 			break;
 		}
 	}

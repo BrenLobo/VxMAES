@@ -65,7 +65,7 @@ void reading(MAESArgument taskParam) {
 /**********************************************/
 int main() {
 	printf("------Sender Receiver APP------ \n");
-	
+	int startTick= tickGet();
 	//Constructors for each initialized class
 	ConstructorAgente(&sender);
 	ConstructorAgente(&receiver);
@@ -92,7 +92,16 @@ int main() {
 	//Platform Init
 	AP.boot(&AP);
 	
-	taskDelay(5000);
+	while(1){
+		int actual_tick=tickGet();
+		
+		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)){
+			printf("Brenda aca");
+			break;
+		}
+	}
+	
+	return 0;
     return 0;
 
 
