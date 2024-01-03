@@ -73,7 +73,7 @@ void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 		
 	char *contenido = (char *)malloc(len_cont_tel+len_message+1);
 	
-	printf("Size of total content: %zu\n", sizeof(contenido));
+//	printf("Size of total content: %zu\n", sizeof(contenido));
 	
 	if (contenido != NULL){
 		//Copy to contenido all the existing string of contenidoTel
@@ -85,7 +85,7 @@ void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 		Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);
 		
 		Behaviour->msg->sendAll(Behaviour->msg);
-//		taskSuspend(information.aid);
+		taskSuspend(information.aid);
 
 		free(contenido);
 	}else{

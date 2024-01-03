@@ -93,21 +93,21 @@ void genAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 		min = 0.1; //mA
 		max = 1000; //mA
 		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
-		snprintf(response, 50, "\r\nCurrent mesasurment: %f\r", value);
+		snprintf(response, 50, "\r\nCurrent measurement: %f\r", value);
 		break;
 
 	case VOLTAGE:
 		min = 0.5; //V
 		max = 3.3; //V
 		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
-		snprintf(response, 50, "\r\nVoltage mesasurment: %f\r", value);
+		snprintf(response, 50, "\r\nVoltage measurement: %f\r", value);
 		break;
 
 	case TEMPERATURE:
 		min = 30; //C
 		max = 100; //C
 		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
-		snprintf(response, 50, "\r\nTemperature mesasurment: %f\r", value);
+		snprintf(response, 50, "\r\nTemperature measurement: %f\r", value);
 		break;
 
 	default:
