@@ -65,7 +65,10 @@ void reading(MAESArgument taskParam) {
 /**********************************************/
 int main() {
 	printf("------Sender Receiver APP------ \n");
+
+	//ticks counter
 	int startTick= tickGet();
+	
 	//Constructors for each initialized class
 	ConstructorAgente(&sender);
 	ConstructorAgente(&receiver);

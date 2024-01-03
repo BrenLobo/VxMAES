@@ -129,7 +129,7 @@ int main() {
 	Person1.Iniciador(&Person1, "Persona 1", 105, 200);
 	Person2.Iniciador(&Person2, "Persona 2", 104, 200);
 	Person3.Iniciador(&Person3, "Persona 3", 103, 200);
-	APTelephone.Agent_Platform(&APTelephone, "AP Telephone",rtpInfo);
+	APTelephone.Agent_Platform(&APTelephone, "AP Telephone",rtpInfo);//add the variable of the RTP
 
 	//Registering the Agents and their respective behaviour into the Platform
 	APTelephone.agent_init(&APTelephone, &Person1, &phonePerson1);

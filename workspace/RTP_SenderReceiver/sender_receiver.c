@@ -65,7 +65,10 @@ void reading(MAESArgument taskParam) {
 /**********************************************/
 int main() {
 	printf("------Sender Receiver APP------ \n");
+	
+	//ticks counter
 	int startTick= tickGet();
+	
 	//Constructors for each initialized class
 	ConstructorAgente(&sender);
 	ConstructorAgente(&receiver);
@@ -87,6 +90,7 @@ int main() {
 	//Registering the Agents and their respective behaviour into the Platform
 	AP.agent_init(&AP,&sender, &writing);
 	AP.agent_init(&AP,&receiver, &reading);
+	printf(" VxMAES booted successfully \n");
 	printf("	Initiating APP\n\n");
 	
 	//Platform Init
