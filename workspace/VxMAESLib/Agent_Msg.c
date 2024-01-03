@@ -161,14 +161,17 @@ void refresh_listFunction(Agent_Msg* Message) {
  *		Outputs: The message type of the message or a no response error.
  */
 MSG_TYPE receiveFunction(Agent_Msg* Message, MAESTickType_t timeout) {
+//	SEM_ID mysem =semOpen("Semaphore",SEM_TYPE_COUNTING,3,SEM_Q_PRIORITY,OM_CREATE,0);
+//	semTake(mysem,WAIT_FOREVER);
 	MsgObj msg;
 	ssize_t receivedBytes=msgQReceive(Message->get_mailbox(Message, Message->caller),(char*)&msg, MAXmsgLength, timeout);
 	if (receivedBytes>0){
 		Message->msg= msg;
-		return Message->msg.type; 
+		return Message->msg.type; // se intercambiaron REVISAR
 	}else{
 		return NO_RESPONSE;
 	}
+//	semGive(mysem);
 };
 
 /**
@@ -177,6 +180,8 @@ MSG_TYPE receiveFunction(Agent_Msg* Message, MAESTickType_t timeout) {
  *		Outputs: An Error code indicating if the message was sent successfuLly.
  */
 ERROR_CODE sendXFunction(Agent_Msg* Message, Agent_AID aid_receiver, MAESTickType_t timeout) {
+//	SEM_ID mysemT =semOpen("SemaphoreB",SEM_TYPE_COUNTING,2,SEM_Q_PRIORITY,OM_CREATE,0);
+//	semTake(mysemT,WAIT_FOREVER);
 	Message->msg.target_agent = aid_receiver; 
 	Message->msg.sender_agent = Message->caller;
 	MAESAgent* agent_caller, * agent_receiver;
@@ -184,16 +189,20 @@ ERROR_CODE sendXFunction(Agent_Msg* Message, Agent_AID aid_receiver, MAESTickTyp
 	agent_receiver = (MAESAgent*)env.get_taskEnv(&env,aid_receiver);
 	if (Message->isRegistered(Message,aid_receiver)==0)
 	{	
+//		semGive(mysemT);
 		return NOT_REGISTERED;
 	}
 	else{
+//		semGive(mysemT);
 		MsgObj msg = Message->msg;
 		if (agent_caller->agent.org == NULL && agent_receiver->agent.org == NULL)
 		{				
 			if (msgQSend(Message->get_mailbox(Message,aid_receiver),(char*)&msg , sizeof(msg), timeout,MSG_PRI_NORMAL) != OK) 
 			{	
+//				semGive(mysemT);
 				return TIMEOUT;
 			}else{
+//				semGive(mysemT);
 				return NO_ERRORS;
 			}
 		}
@@ -204,15 +213,18 @@ ERROR_CODE sendXFunction(Agent_Msg* Message, Agent_AID aid_receiver, MAESTickTyp
 			{
 				if (msgQSend(Message->get_mailbox(Message,aid_receiver), (char*)&msg , sizeof(msg), timeout,MSG_PRI_NORMAL) != OK)
 				{	
+//					semGive(mysemT);
 					return TIMEOUT;
 				}
 				else
 				{	
+//					semGive(mysemT);
 					return NO_ERRORS;
 				}
 			}
 			else
 			{	
+//				semGive(mysemT);
 				return INVALID;
 			}
 		}
@@ -220,15 +232,18 @@ ERROR_CODE sendXFunction(Agent_Msg* Message, Agent_AID aid_receiver, MAESTickTyp
 		{
 			if (msgQSend(Message->get_mailbox(Message,aid_receiver), (char*)&msg , sizeof(msg), timeout,MSG_PRI_NORMAL) != OK)
 			{	
+//				semGive(mysemT);
 				return TIMEOUT;
 			}
 			else
 			{	
+//				semGive(mysemT);
 				return NO_ERRORS;
 			}
 		}
 		else
 		{	
+//			semGive(mysemT);
 			return NOT_REGISTERED;
 		}
 	}

@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+
+
 /**********************************************/
 /* 		  Defining the app's variables.       */
 /**********************************************/
@@ -21,6 +24,8 @@ sysVars env;
 OneShotBehaviour BehaviourP1, BehaviourP2, BehaviourP3;
 Agent_Msg msgperson1, msgperson2, msgperson3;
 SEM_ID    mySemMId; 
+
+  
 
 /**********************************************/
 /*    Setup functions related to each agent   */
@@ -50,9 +55,9 @@ void person3setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 /*   Action function related to the Person 1  */
 /**********************************************/
 void persona1action(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
-	Agent_info information = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
-	printf("\n Running agent: %s", information.agent_name);
-	printf("\n Message from agent %s: %s\n", information.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
+	Agent_info informacion = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
+	printf("\n Agente en ejecucion: %s", informacion.agent_name);
+	printf("\n Este es el mensaje de %s: %s\n", informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
 	Behaviour->msg->sendAll(Behaviour->msg);
 };
 
@@ -60,32 +65,32 @@ void persona1action(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 /*Action function related to the Person 2 and 3 */
 /************************************************/
 void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
-	Agent_info information = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
-	printf("\n Running agent: %s\n",information.agent_name);
-	char* msg_content = Behaviour->msg->get_msg_content(Behaviour->msg); //saves the agent's own message
+	Agent_info informacion = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
+	printf("\n Agente en ejecucion: %s\n",informacion.agent_name);
+	char* msg_content = Behaviour->msg->get_msg_content(Behaviour->msg);
 	size_t len_message = strlen(msg_content);
-	printf("%s own message: %s , size: %d\n", information.agent_name, msg_content, len_message);
+	printf("Mensaje propio: %s del agente: %s, tamanio: %d\n" , msg_content, informacion.agent_name, len_message);
 	
 	Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);
-	char* contenidoTel= Behaviour->msg->get_msg_content(Behaviour->msg); // saves the message received from the previous agent
+	char* contenidoTel= Behaviour->msg->get_msg_content(Behaviour->msg);
 	size_t len_cont_tel = strlen(contenidoTel);
-	printf(" %s received message: %s , size: %d\n", information.agent_name, contenidoTel,  len_cont_tel);
+	printf("Mensaje recibido: %s del agente: %s, tamanio: %d\n" , contenidoTel, informacion.agent_name, len_cont_tel);
 		
 	char *contenido = (char *)malloc(len_cont_tel+len_message+1);
 	
-	printf("Size of total content: %zu\n", sizeof(contenido));
+	printf("tamanio del contenido: %zu\n", sizeof(contenido));
 	
 	if (contenido != NULL){
 		//Copy to contenido all the existing string of contenidoTel
 		strcpy(contenido,contenidoTel);
-		//Concatenate contenido, which already has the total strings from the previous message to msg_conten, that is the new message
+		//Concatenate contenido, wich already has the total strings from the previuos message to msg_conten, that is the new message
 		strcat(contenido,msg_content);
-		printf("\t>>Concatenated message: %s\n\n", contenido);
+		printf("\t>>Se concateno a el char contenido lo que esta en el telefono: %s\n\n", contenido);
 	
 		Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);
 		
 		Behaviour->msg->sendAll(Behaviour->msg);
-//		taskSuspend(information.aid);
+		taskSuspend(informacion.aid);
 
 		free(contenido);
 	}else{
@@ -126,9 +131,7 @@ void phonePerson3(MAESArgument taskParam) {
 int main() {
 	printf("------Telephone Game APP ------ \n");
 	
-	//ticks counter start
 	int startTick= tickGet();
-	
 	//Constructors for each initialized class
 	ConstructorAgente(&Person1);
 	ConstructorAgente(&Person2);
@@ -149,7 +152,7 @@ int main() {
 	Person1.Iniciador(&Person1, "Persona 1", 105, 200);
 	Person2.Iniciador(&Person2, "Persona 2", 104, 200);
 	Person3.Iniciador(&Person3, "Persona 3", 103, 200);
-	APTelephone.Agent_Platform(&APTelephone, "AP Telephone",rtpInfo); //add the variable name of the RTP
+	APTelephone.Agent_Platform(&APTelephone, "AP Telephone",rtpInfo);
 
 	//Registering the Agents and their respective behaviour into the Platform
 	APTelephone.agent_init(&APTelephone, &Person1, &phonePerson1);
