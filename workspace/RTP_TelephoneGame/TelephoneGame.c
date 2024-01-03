@@ -57,7 +57,7 @@ void person3setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 void persona1action(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
 	printf("\n Agente en ejecucion: %s", informacion.agent_name);
-	printf("\nEste es el mensaje de %s: %s\n", informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
+	printf("\n Este es el mensaje de %s: %s\n", informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
 	Behaviour->msg->sendAll(Behaviour->msg);
 };
 
@@ -168,7 +168,7 @@ int main() {
 		int actual_tick=tickGet();
 		
 		if ((actual_tick-startTick)>=(3*ONE_MINUTE_IN_TICKS)){
-			printf("Fin de la Ejecucion");
+			printf("************ VxMAES app execution stops ******************");
 			break;
 		}
 	}

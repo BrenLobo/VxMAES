@@ -26,7 +26,8 @@ typedef struct letboot
 {
 	bool pass;
 	actual type;
-	float DataReady;
+	MAESTickType_t rate;
+//	float DataReady;
 }bootable;
 
 /**********************************************/
@@ -48,7 +49,7 @@ float min, max, value;
 void meaSetup(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 	Behaviour->msg->Agent_Msg(Behaviour->msg);
 	Behaviour->msg->add_receiver(Behaviour->msg, inspector.AID(&inspector));
-	taskDelay(100);
+	
 }
 
 // action
@@ -73,7 +74,7 @@ void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 			snprintf(content, 80, "\r\n Water measurement: %f\r", value); 
 			water_pass.pass = true;
 		}
-		water_pass.DataReady = value;
+//		water_pass.DataReady = value;
 		break;
 	
 	case OIL:  //presion aceite
@@ -82,7 +83,6 @@ void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 		value = (float)(rand() % 51 + 30); // N-M+1 +  M  Nmax
 		
 		if (value<min || value>max) {
-			if (value < min){}
 			snprintf(content, 80, "\r\n Check oil pressure!!! Normal state 40-55 psi, now is in %f\n", value);
 			oil_pass.pass = false;
 		}
@@ -91,7 +91,7 @@ void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 			oil_pass.pass = true;
 		
 		}
-		oil_pass.DataReady = value;
+//		oil_pass.DataReady = value;
 		break;
 
 	case TIRE: //Tire presion llantas aire freno
@@ -106,7 +106,7 @@ void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 			snprintf(content, 80, "\r\n Tire measurement: %f\r", value);
 			tire_pass.pass = true;
 		}
-		tire_pass.DataReady = value;
+//		tire_pass.DataReady = value;
 		break;
 
 	default:
@@ -118,7 +118,9 @@ void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 
 	Behaviour->msg->set_msg_content(Behaviour->msg, content);
 	Behaviour->msg->set_msg_type(Behaviour->msg, INFORM);
-	Behaviour->msg->sendAll(Behaviour->msg);	
+	AP.agent_wait(&AP,data->rate);
+	Behaviour->msg->sendX(Behaviour->msg,inspector.AID(&inspector), WAIT_FOREVER);	
+	printf("The message had been send: %s \n",informacion.agent_name);
 }
 
 /**********************************************/
@@ -135,35 +137,28 @@ void Verification_Setup(CyclicBehaviour* Behaviour, MAESArgument taskParam){
 // action
 void Verification_SysAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	printf("\n........Inicializando arranque sistema........\n");
-	while (true) {
+	while (true) {	
 		if ((AP.get_state(&AP, water_temp.AID(&water_temp)) == SUSPENDED) && (AP.get_state(&AP, oil_pressure.AID(&oil_pressure)) == SUSPENDED) && (AP.get_state(&AP, tire_pressure.AID(&tire_pressure)) == SUSPENDED)){
 			if ((water_pass.pass == true) && (oil_pass.pass == true) && (tire_pass.pass == true)) {
 				printf("\n  Verificacion del sistema completado   \n");
-				printf("\n........Inicializando arranque sistema2........\n");
-//				AP.agent_wait(&AP,500);
+				printf("\n........Inicializando arranque sistema2........\n");	
 				break;
 			} else {
 				printf("\n-------------Adjust Systems ---------------\n");
-//				AP.agent_wait(&AP, 500);
 				break;
 			}
 		} 
 		else{
-//		if ((AP.get_state(&AP, water_temp.AID(&water_temp)) != SUSPENDED) || (AP.get_state(&AP, oil_pressure.AID(&oil_pressure)) != SUSPENDED) || (AP.get_state(&AP, tire_pressure.AID(&tire_pressure)) != SUSPENDED)){
-			Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);
-			if (Behaviour->msg->get_msg_type(Behaviour->msg) == INFORM){			
+			Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);		
+			if (Behaviour->msg->get_msg_type(Behaviour->msg) == INFORM){				
 				Agent_info informacion = AP.get_Agent_description(AP.get_running_agent(&AP));
 				printf("\n Agente en ejecucion inspector: %s \n",informacion.agent_name);
-				char* mensaje = Behaviour->msg->get_msg_content(Behaviour->msg);								
-				Behaviour->msg->suspend(Behaviour->msg, Behaviour->msg->get_sender(Behaviour->msg));
-				printf("%s\n", mensaje);
-//				AGENT_MODE estado =AP.get_state(&AP, water_temp.AID(&water_temp));
-//				AGENT_MODE estado1 =AP.get_state(&AP, oil_pressure.AID(&oil_pressure));
-//				AGENT_MODE estado2 =AP.get_state(&AP, tire_pressure.AID(&tire_pressure));
-//				printf("agua: %d,aceite: %d,tire: %d .\n",estado,estado1,estado2);
-			}
+				char* mensaje = Behaviour->msg->get_msg_content(Behaviour->msg);
+				Behaviour->msg->suspend(Behaviour->msg, Behaviour->msg->get_sender(Behaviour->msg));	
+				printf("%s\n", mensaje);	
+			}			
 		}
-		
+				
 	}
 	water_pass.pass= false;//, oil_pass.pass, tire_pass.pass =false;
 	oil_pass.pass = false;
@@ -216,7 +211,9 @@ void InspectorFunction(MAESArgument taskParam) {
 int main() {
 	printf("------Boot Verification System ------ \n");
 	int startTick= tickGet();
-	
+	tire_pass.rate=500;
+	water_pass.rate=1000;
+	oil_pass.rate=1500;
 	water_pass.pass = false;
 	oil_pass.pass = false;
 	tire_pass.pass = false;
@@ -241,20 +238,20 @@ int main() {
 	ConstructorCyclicBehaviour(&ins_behaviour);
 
 	//Initializing the Agents and the Platform.
-	inspector.Iniciador(&inspector, "Inspector", 102, 100);
-	water_temp.Iniciador(&water_temp, "Water Temperature", 103, 100);
-	oil_pressure.Iniciador(&oil_pressure, "Oil pressure", 104, 100);
-	tire_pressure.Iniciador(&tire_pressure, "Tire pressure", 105, 100);
+	inspector.Iniciador(&inspector, "Inspector", 200, 100);
+	water_temp.Iniciador(&water_temp, "Water Temperature", 205, 100);
+	oil_pressure.Iniciador(&oil_pressure, "Oil pressure", 203, 100);
+	tire_pressure.Iniciador(&tire_pressure, "Tire pressure", 204, 100);
 	
-	//Defining the RPT task
 	TASK_ID rtpInfo=taskIdSelf();
 	AP.Agent_Platform(&AP, "App Platform",rtpInfo);
 
 	//Registering the Agents and their respective behaviour into the Platform
-	AP.agent_initConParam(&AP, &water_temp, &WaterFunction,(MAESArgument)&water_pass);
+	AP.agent_init(&AP, &inspector, &InspectorFunction);
 	AP.agent_initConParam(&AP, &oil_pressure, &OilFunction,(MAESArgument)&oil_pass);
 	AP.agent_initConParam(&AP, &tire_pressure, &TireFunction,(MAESArgument)&tire_pass);
-	AP.agent_init(&AP, &inspector, &InspectorFunction);
+	AP.agent_initConParam(&AP, &water_temp, &WaterFunction,(MAESArgument)&water_pass);
+	
 	printf("VxMAES booted successfully \n");
 	printf("Initiating APP\n\n");
 	
@@ -264,8 +261,8 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)){
-			printf("\n Program execution: 1 min.\n");
+		if ((actual_tick-startTick)>=(2*ONE_MINUTE_IN_TICKS)){
+			printf("************ VxMAES app execution stops ******************");
 			break;
 		}
 	}

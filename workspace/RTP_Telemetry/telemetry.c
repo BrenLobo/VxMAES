@@ -83,8 +83,7 @@ void Temperaturelogger(MAESArgument taskParam) {
 
 void genAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = Platform.get_Agent_description(Platform.get_running_agent(&Platform));
-	printf("\n Agente en ejecucion: ");
-	printf(informacion.agent_name);
+	printf("\n Agente en ejecucion: %s",informacion.agent_name);	
 	Behaviour->msg->receive(Behaviour->msg,WAIT_FOREVER);
 	srand((unsigned int)time(NULL));
 	int i = (int)Behaviour->msg->get_msg_content(Behaviour->msg);
@@ -136,7 +135,7 @@ int main() {
 	//Rates and types for each logger.
 	log_current.rate = 500;
 	log_voltage.rate = 1000;
-	log_temperature.rate = 2000;
+	log_temperature.rate = 1500;
 	log_current.type = CURRENT;
 	log_voltage.type = VOLTAGE;
 	log_temperature.type = TEMPERATURE;
@@ -158,29 +157,30 @@ int main() {
 	ConstructorCyclicBehaviour(&genBehaviour);
 
 	//Initializing the Agents and the Platform.
-	logger_current.Iniciador(&logger_current, "Current Logger", 105, 100);
-	logger_voltage.Iniciador(&logger_voltage, "Voltage Logger", 104, 100);
-	logger_temperature.Iniciador(&logger_temperature, "Temperature Logger", 103, 100);
-	measurement.Iniciador(&measurement, "Measure", 102, 10);
+	logger_current.Iniciador(&logger_current, "Current Logger", 201, 100);
+	logger_voltage.Iniciador(&logger_voltage, "Voltage Logger", 202, 100);
+	logger_temperature.Iniciador(&logger_temperature, "Temperature Logger", 203, 100);
+	measurement.Iniciador(&measurement, "Measure", 200, 10);
 	
 	TASK_ID rtpInfo=taskIdSelf();
 	Platform.Agent_Platform(&Platform, "telemetry_platform",rtpInfo);
 
 	//Registering the Agents and their respective behaviour into the Platform
-	Platform.agent_initConParam(&Platform,&logger_current, &Currentlogger, (MAESArgument)&log_current);
-	Platform.agent_initConParam(&Platform, &logger_voltage, &Voltagelogger, (MAESArgument)&log_voltage);
-	Platform.agent_initConParam(&Platform, &logger_temperature, &Temperaturelogger, (MAESArgument)&log_temperature);
 	Platform.agent_init(&Platform, &measurement, &gen);
-	Platform.boot(&Platform);
+	Platform.agent_initConParam(&Platform, &logger_temperature, &Temperaturelogger, (MAESArgument)&log_temperature);
+	Platform.agent_initConParam(&Platform, &logger_voltage, &Voltagelogger, (MAESArgument)&log_voltage);
+	Platform.agent_initConParam(&Platform,&logger_current, &Currentlogger, (MAESArgument)&log_current);
 	printf("CMAES booted successfully \n");
 	printf("Initiating APP\n\n");
+	Platform.boot(&Platform);
+	
 
 	// Start the scheduler so the created tasks start executing.
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)){
-			printf("\n Program execution: 1 min.\n");
+		if ((actual_tick-startTick)>=(3*ONE_MINUTE_IN_TICKS)){
+			printf("************ VxMAES app execution stops ******************");
 			break;
 		}
 	}
