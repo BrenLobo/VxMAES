@@ -7,7 +7,6 @@
 #include <vxWorks.h>
 #include "VxMAES.h"
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <time.h>
 
@@ -54,37 +53,26 @@ void meaSetup(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 
 // action
 void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
-	float min, max, value;
+	int min, max, value;
 	Agent_info informacion = AP.get_Agent_description(AP.get_running_agent(&AP));
 	printf("\n Running measurement agent: %s \n",informacion.agent_name);
 	data = (bootable*)taskParam;
-	char content[80]="";
-	char c_value[10]="";
+	char content[80];
 	int num =(int)data->type;
 	srand((unsigned int)time(NULL));
-	printf("comienza\n");
 	switch (num) {
 	case WATER: ///temp water
-		min = 85.8f;//centi
-		max = 100.4f;//centi
-		printf("set value\n");
-		value = (float)((rand() % 50) + 70.1f);
-//		value = (float)(rand() % 71 + 50);
-//		char c_value[100];
-		printf("Convert value to string\n");
-		sprintf(c_value, "%f", value);
-		printf("Conversion success\n");
+		min = 85;//centi
+		max = 100;//centi
+		
+		value = (int)(rand() % 71 + 50);
 		if (value<min || value>max) {
-//			snprintf(content, 80, "\r\n Check water temperature!!! Normal state 85-100 C, now is in %.2f \n", value);
-			printf("First if\n");
-			printf("\n Check water temperature!!! Normal state 85-100 C, now is in %f \n", value);
+			snprintf(content, 80, "\r\n Check water temperature!!! Normal state 85-100 C, now is in %d\n", value);
 			water_pass.pass = false;
 		}
 		else
 		{
-//			snprintf(content, 80, "\r\n Water measurement: %.2f \r", value);
-			printf("Else\n");
-			printf("\n Water measurement: %f \n", value); 
+			snprintf(content, 80, "\r\n Water measurement: %d\r", value); 
 			water_pass.pass = true;
 		}
 		break;
@@ -92,14 +80,14 @@ void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 	case OIL:  //oil pressure
 		min = 40;//psi
 		max = 55;//psi
-		value = (float)(rand() % 51 + 30); // N-M+1 +  M  Nmax
+		value = (int)(rand() % 51 + 30); // N-M+1 +  M  Nmax
 		
 		if (value<min || value>max) {
-			snprintf(content, 80, "\r\n Check oil pressure!!! Normal state 40-55 psi, now is in %f \n", value);
+			snprintf(content, 80, "\r\n Check oil pressure!!! Normal state 40-55 psi, now is in %d\n", value);
 			oil_pass.pass = false;
 		}
 		else{
-			snprintf(content, 80, "\r\n Oil measurement: %f \r", value);
+			snprintf(content, 80, "\r\n Oil measurement: %d\r", value);
 			oil_pass.pass = true;
 		
 		}
@@ -108,13 +96,13 @@ void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 	case TIRE: //Tire pressure
 		min = 60;//psi
 		max = 125;//psi
-		value = (float)(rand() % 111 + 40);
+		value = (int)(rand() % 111 + 40);
 		if (value<min || value>max) {
-			snprintf(content, 80, "\r\n Check tire pressure !!! Normal state 60-125 psi, now is in %f\n", value);
+			snprintf(content, 80, "\r\n Check tire pressure !!! Normal state 60-125 psi, now is in %d\n", value);
 			tire_pass.pass = false;
 		}
 		else {
-			snprintf(content, 80, "\r\n Tire measurement: %f\r", value);
+			snprintf(content, 80, "\r\n Tire measurement: %d\r", value);
 			tire_pass.pass = true;
 		}
 		break;
@@ -277,7 +265,7 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(2*ONE_MINUTE_IN_TICKS)){
+		if ((actual_tick-startTick)>=(2*MinuteInTicks)){
 			printf("************ VxMAES app execution stops ******************");
 			break;
 		}

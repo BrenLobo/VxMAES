@@ -186,14 +186,17 @@ void Agent_PlatformFunction(Agent_Platform* platform, char* name, Agent_AID rtpI
 
 /**
  * Agent Platform with Conditions Function: This function sets some of the initial values of the parameters
- * 			    needed in the agent platform. In this functin, some conditions are established by the user. 
+ * 			    needed in the agent platform. In this function, some conditions are established by the user. 
  *		 Inputs: The Platform instance itself, the platform given name and the conditions given by the user.
  *		Outputs: None.
  */
-void Agent_PlatformWithCondFunction(Agent_Platform* platform, char* name, USER_DEF_COND* user_cond) {
+void Agent_PlatformWithCondFunction(Agent_Platform* platform, char* name, USER_DEF_COND* user_cond,Agent_AID rtpInfo) {
 	platform->agentAMS.agent.agent_name = name;
 	platform->ptr_cond = user_cond;
+	platform->description.RTP_info= rtpInfo;
 	platform->description.subscribers = 0;
+	platform->description.AP_name = name;
+	platform->agentAMS.agent.priority = MAESmaxPriority;
 	for (MAESUBaseType_t i = 0; i < AGENT_LIST_SIZE; i++)
 	{
 		platform->Agent_Handle[i] = (Agent_AID)NULL;
@@ -210,8 +213,8 @@ bool bootFunction(Agent_Platform* platform) {
 	if (taskIdSelf() == platform->description.RTP_info)
 	{
 		ConstructorAgente(&platform->agentAMS);		
-		platform->agentAMS.Iniciador(&platform->agentAMS, "AMSAgent", MAESmaxPriority, 1024); //REVISAR tamano
-		platform->agentAMS.agent.mailbox_handle = msgQCreate(1,MAXmsgLength,MSG_Q_FIFO );
+		platform->agentAMS.Iniciador(&platform->agentAMS, "AMSAgent", MAESmaxPriority, 1024); 
+		platform->agentAMS.agent.queue_id = msgQCreate(1,MAXmsgLength,MSG_Q_FIFO );
 		// Task
 		platform->parameter->cond=platform->ptr_cond;
 		platform->parameter->services = platform;
@@ -258,7 +261,7 @@ void agent_initFunction(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunc
 	if (taskIdSelf() == platform->description.RTP_info)
 	{
 		// Mailbox
-		agent->agent.mailbox_handle = msgQCreate(1, MAXmsgLength,MSG_Q_FIFO);
+		agent->agent.queue_id = msgQCreate(1, MAXmsgLength,MSG_Q_FIFO);
 		// Task
 		agent->resources.function = behaviour;
 		agent->resources.taskParameters = NULL;
@@ -277,7 +280,7 @@ void agent_initConParamFunction(Agent_Platform* platform, MAESAgent* agent, MAES
 	if (taskIdSelf() == platform->description.RTP_info)
 	{
 		// Mailbox
-		agent->agent.mailbox_handle = msgQCreate(1, MAXmsgLength,MSG_Q_FIFO);
+		agent->agent.queue_id = msgQCreate(1, MAXmsgLength,MSG_Q_FIFO);
 		// Task
 		agent->resources.function = behaviour;
 		agent->resources.taskParameters = taskParam;
@@ -471,11 +474,11 @@ ERROR_CODE kill_agentFunction(Agent_Platform* platform, Agent_AID aid) {
 		if (error == NO_ERRORS)
 		{
 			MAESAgent* a;
-			Mailbox_Handle m;
+			Queue_ID m;
 
 			a = (MAESAgent*)env.get_taskEnv(&env, aid);;
 			a->agent.aid = NULL;
-			m = a->agent.mailbox_handle;
+			m = a->agent.queue_id;
 			msgQDelete(m);
 			taskDelete(aid);
 			
@@ -547,14 +550,14 @@ void restartFunction(Agent_Platform* platform, Agent_AID aid) {
 	{
 		MAESAgent* a;
 		a = (MAESAgent*)env.get_taskEnv(&env, aid);
-		Mailbox_Handle m;
+		Queue_ID m;
 		// delete Task and Mailbox
-		m = a->agent.mailbox_handle; 
+		m = a->agent.queue_id; 
 		taskDelete(aid);
 		msgQDelete(m);
 		env.erase_TaskEnv(&env,aid);
 		// Mailbox = Queue
-		a->agent.mailbox_handle = msgQCreate(1,MAXmsgLength,MSG_Q_FIFO);
+		a->agent.queue_id = msgQCreate(1,MAXmsgLength,MSG_Q_FIFO);
 		
 		// Task
 		a->agent.aid=taskCreate(a->agent.agent_name, a->agent.priority,VX_FP_TASK,a->resources.stackSize,a->resources.function, a->resources.taskParameters, 0, 0, 0, 0, 0, 0, 0, 0, 0);

@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-
 /**********************************************/
 /*			    Enums and structs			  */
 /**********************************************/
@@ -43,7 +41,6 @@ sysVars env;
 CyclicBehaviour CurrentBehaviour,VoltageBehaviour,TemperatureBehaviour, genBehaviour;
 Agent_Msg msg_current,msg_voltage,msg_temperature, msg_gen;
 logger_info log_current, log_voltage, log_temperature, *info, *infox;
-
 
 
 
@@ -95,35 +92,35 @@ void Temperaturelogger(MAESArgument taskParam) {
 
 //action
 void genAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
-	double min, max, value;
 	Agent_info informacion = Platform.get_Agent_description(Platform.get_running_agent(&Platform));
-	printf("\n Agente en ejecucion: %s \n",informacion.agent_name);	
-	printf("aca1\n")
+	printf("\n Agente en ejecucion: %s",informacion.agent_name);	
+	
 	char response[50]="";
-	printf("aca2\n")
+	int min, max, value;
 	Behaviour->msg->receive(Behaviour->msg,WAIT_FOREVER);
 	srand((unsigned int)time(NULL));
+	
 	int i = (int)Behaviour->msg->get_msg_content(Behaviour->msg);
 	switch (i)
 	{
 	case CURRENT:
-		min = 0.1; //mA
+		min = 1; //mA
 		max = 1000; //mA
-		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
-		snprintf(response, 50, "\r\nCurrent measurement: %f\r", value);
+		value = (int)(min + rand() / (RAND_MAX / (max - min + 1) + 1));
+		snprintf(response, 50, "\r\nCurrent measurement: %d\r", value);
 		break;
 
 	case VOLTAGE:
-		min = 0.5; //V
-		max = 3.3; //V
-		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
-		snprintf(response, 50, "\r\nVoltage measurement: %f\r", value);
+		min = 0; //V
+		max = 4; //V
+		value = (int)(min + rand() / (RAND_MAX / (max - min + 1) + 1));
+		snprintf(response, 50, "\r\nVoltage measurement: %d\r", value);
 		break;
 
 	case TEMPERATURE:
 		min = 30; //C
 		max = 100; //C
-		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
+		value = (int)(min + rand() / (RAND_MAX / (max - min + 1) + 1));
 		snprintf(response, 50, "\r\nTemperature measurement: %f\r", value);
 		break;
 

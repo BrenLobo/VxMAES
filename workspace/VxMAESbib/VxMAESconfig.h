@@ -17,7 +17,7 @@
 #define MAESTaskHandle_t TASK_ID           // Task Identifier
 #define MAESQueueHandle_t MSG_Q_ID         // Message Queue
 #define MAESArgument _Vx_usr_arg_t         // Parameter
-#define MAESTickType_t _Vx_(ticks_t         // Ticks type
+#define MAESTickType_t _Vx_ticks_t         // Ticks type
 #define MAESTaskFunction_t void*//FUNCPTR  // Function Pointer
 #define MAESUBaseType_t  long unsigned int // integer
 #define MAESStackSize size_t 			   // Stack type
@@ -39,6 +39,6 @@
 #define MAESmaxPriority 101 			   // The Higher priority for application      
 #define MAESminStacksize 50 			   // Minimum stack size
 #define MAXmsgLength 100				   // Maximum Message Length (bytes)
-#define ONE_MINUTE_IN_TICKS (sysClkRateGet() * 60)
+#define MinuteInTicks (sysClkRateGet() * 60)
 
 #endif /* VXMAESCONFIG_H_ */

@@ -96,8 +96,7 @@ void genAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	printf("\n Agente en ejecucion: %s",informacion.agent_name);	
 	
 	char response[50]="";
-	double min, max, value;
-	printf("aca1\n");
+	int min, max, value;
 	Behaviour->msg->receive(Behaviour->msg,WAIT_FOREVER);
 	srand((unsigned int)time(NULL));
 	
@@ -105,23 +104,23 @@ void genAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	switch (i)
 	{
 	case CURRENT:
-		min = 0.1; //mA
+		min = 1; //mA
 		max = 1000; //mA
-		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
-		snprintf(response, 50, "\r\nCurrent measurement: %f\r", value);
+		value = (int)(min + rand() / (RAND_MAX / (max - min + 1) + 1));
+		snprintf(response, 50, "\r\nCurrent measurement: %d\r", value);
 		break;
 
 	case VOLTAGE:
-		min = 0.5; //V
-		max = 3.3; //V
-		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
-		snprintf(response, 50, "\r\nVoltage measurement: %f\r", value);
+		min = 0; //V
+		max = 4; //V
+		value = (int)(min + rand() / (RAND_MAX / (max - min + 1) + 1));
+		snprintf(response, 50, "\r\nVoltage measurement: %d\r", value);
 		break;
 
 	case TEMPERATURE:
 		min = 30; //C
 		max = 100; //C
-		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
+		value = (int)(min + rand() / (RAND_MAX / (max - min + 1) + 1));
 		snprintf(response, 50, "\r\nTemperature measurement: %f\r", value);
 		break;
 
@@ -204,7 +203,7 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(3*ONE_MINUTE_IN_TICKS)){
+		if ((actual_tick-startTick)>=(3*MinuteInTicks)){
 			printf("************ VxMAES app execution stops ******************");
 			break;
 		}

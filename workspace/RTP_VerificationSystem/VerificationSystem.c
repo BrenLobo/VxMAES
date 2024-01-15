@@ -53,7 +53,7 @@ void meaSetup(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 
 // action
 void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
-	float min, max, value;
+	int min, max, value;
 	Agent_info informacion = AP.get_Agent_description(AP.get_running_agent(&AP));
 	printf("\n Running measurement agent: %s \n",informacion.agent_name);
 	data = (bootable*)taskParam;
@@ -62,47 +62,47 @@ void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 	srand((unsigned int)time(NULL));
 	switch (num) {
 	case WATER: ///temp water
-		min = 85.0;//centi
-		max = 100.0;//centi
+		min = 85;//centi
+		max = 100;//centi
 		
-		value = (float)(rand() % 71 + 50);
+		value = (int)(rand() % 71 + 50);
 		if (value<min || value>max) {
-			snprintf(content, 80, "\r\n Check water temperature!!! Normal state 85-100 C, now is in %f\n", value);
+			snprintf(content, 80, "\r\n Check water temperature!!! Normal state 85-100 C, now is in %d\n", value);
 			water_pass.pass = false;
 		}
 		else
 		{
-			snprintf(content, 80, "\r\n Water measurement: %f\r", value); 
+			snprintf(content, 80, "\r\n Water measurement: %d\r", value); 
 			water_pass.pass = true;
 		}
 		break;
 	
 	case OIL:  //oil pressure
-		min = 40.0;//psi
-		max = 55.0;//psi
-		value = (float)(rand() % 51 + 30); // N-M+1 +  M  Nmax
+		min = 40;//psi
+		max = 55;//psi
+		value = (int)(rand() % 51 + 30); // N-M+1 +  M  Nmax
 		
 		if (value<min || value>max) {
-			snprintf(content, 80, "\r\n Check oil pressure!!! Normal state 40-55 psi, now is in %f\n", value);
+			snprintf(content, 80, "\r\n Check oil pressure!!! Normal state 40-55 psi, now is in %d\n", value);
 			oil_pass.pass = false;
 		}
 		else{
-			snprintf(content, 80, "\r\n Oil measurement: %f\r", value);
+			snprintf(content, 80, "\r\n Oil measurement: %d\r", value);
 			oil_pass.pass = true;
 		
 		}
 		break;
 
 	case TIRE: //Tire pressure
-		min = 60.0;//psi
-		max = 125.0;//psi
-		value = (float)(rand() % 111 + 40);
+		min = 60;//psi
+		max = 125;//psi
+		value = (int)(rand() % 111 + 40);
 		if (value<min || value>max) {
-			snprintf(content, 80, "\r\n Check tire pressure !!! Normal state 60-125 psi, now is in %f\n", value);
+			snprintf(content, 80, "\r\n Check tire pressure !!! Normal state 60-125 psi, now is in %d\n", value);
 			tire_pass.pass = false;
 		}
 		else {
-			snprintf(content, 80, "\r\n Tire measurement: %f\r", value);
+			snprintf(content, 80, "\r\n Tire measurement: %d\r", value);
 			tire_pass.pass = true;
 		}
 		break;

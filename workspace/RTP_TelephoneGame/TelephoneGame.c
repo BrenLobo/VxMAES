@@ -20,7 +20,6 @@ Agent_Platform APTelephone;
 sysVars env;
 OneShotBehaviour BehaviourP1, BehaviourP2, BehaviourP3;
 Agent_Msg msgperson1, msgperson2, msgperson3;
-SEM_ID    mySemMId; 
 
 /**********************************************/
 /*    Setup functions related to each agent   */
