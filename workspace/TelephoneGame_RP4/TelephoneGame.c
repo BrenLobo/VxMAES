@@ -8,6 +8,8 @@
 #include <vxWorks.h>
 #include "VxMAES.h"
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /**********************************************/
 /* 		  Defining the app's variables.       */
@@ -19,8 +21,6 @@ sysVars env;
 OneShotBehaviour BehaviourP1, BehaviourP2, BehaviourP3;
 Agent_Msg msgperson1, msgperson2, msgperson3;
 SEM_ID    mySemMId; 
-
-  
 
 /**********************************************/
 /*    Setup functions related to each agent   */
@@ -50,31 +50,48 @@ void person3setup(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 /*   Action function related to the Person 1  */
 /**********************************************/
 void persona1action(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
-	Agent_info informacion = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
-	printf("\n Agente en ejecucion: %s", informacion.agent_name);
-	printf("\nEste es el mensaje de %s: %s\n", informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
+	Agent_info information = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
+	printf("\n Running agent: %s", information.agent_name);
+	printf("\n Message from agent %s: %s\n", information.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
 	Behaviour->msg->sendAll(Behaviour->msg);
-
 };
 
 /************************************************/
 /*Action function related to the Person 2 and 3 */
 /************************************************/
 void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
-	Agent_info informacion = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
-	printf("\n Agente en ejecucion: %s\n",informacion.agent_name);
-	char* msg_content = Behaviour->msg->get_msg_content(Behaviour->msg);
+	Agent_info information = APTelephone.get_Agent_description(APTelephone.get_running_agent(&APTelephone));
+	printf("\n Running agent: %s\n",information.agent_name);
+	char* msg_content = Behaviour->msg->get_msg_content(Behaviour->msg); //saves the agent's own message
+	size_t len_message = strlen(msg_content);
+	printf("%s own message: %s , size: %d\n", information.agent_name, msg_content, len_message);
+	
 	Behaviour->msg->receive(Behaviour->msg, WAIT_FOREVER);
-	char* contenidoTel= Behaviour->msg->get_msg_content(Behaviour->msg);
-	char contenido[30]="";
-	strncat_s(contenido, 30, contenidoTel, 14);
-//	taskDelay(20);
-	strncat_s(contenido, 30, msg_content, 10);
-	Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);
-	taskDelay(50);
-	printf("\nEste es el mensaje de %s: %s\n",informacion.agent_name, Behaviour->msg->get_msg_content(Behaviour->msg));
-	Behaviour->msg->sendAll(Behaviour->msg);
+	char* contenidoTel= Behaviour->msg->get_msg_content(Behaviour->msg); // saves the message received from the previous agent
+	size_t len_cont_tel = strlen(contenidoTel);
+	printf(" %s received message: %s , size: %d\n", information.agent_name, contenidoTel,  len_cont_tel);
+		
+	char *contenido = (char *)malloc(len_cont_tel+len_message+1);
+	
+//	printf("Size of total content: %zu\n", sizeof(contenido));
+	
+	if (contenido != NULL){
+		//Copy to contenido all the existing string of contenidoTel
+		strcpy(contenido,contenidoTel);
+		//Concatenate contenido, which already has the total strings from the previous message to msg_conten, that is the new message
+		strcat(contenido,msg_content);
+		printf("\t>>Concatenated message: %s\n\n", contenido);
+	
+		Behaviour->msg->set_msg_content(Behaviour->msg,(char*)contenido);
+		
+		Behaviour->msg->sendAll(Behaviour->msg);
+		taskSuspend(information.aid);
 
+		free(contenido);
+	}else{
+		printf("Allocation failed");
+	}
+	
 };
 
 
@@ -108,7 +125,10 @@ void phonePerson3(MAESArgument taskParam) {
 /**********************************************/
 int main() {
 	printf("------Telephone Game APP ------ \n");
+	
+	//ticks counter start
 	int startTick= tickGet();
+	
 	//Constructors for each initialized class
 	ConstructorAgente(&Person1);
 	ConstructorAgente(&Person2);
@@ -129,7 +149,7 @@ int main() {
 	Person1.Iniciador(&Person1, "Persona 1", 105, 200);
 	Person2.Iniciador(&Person2, "Persona 2", 104, 200);
 	Person3.Iniciador(&Person3, "Persona 3", 103, 200);
-	APTelephone.Agent_Platform(&APTelephone, "AP Telephone",rtpInfo);//add the variable of the RTP
+	APTelephone.Agent_Platform(&APTelephone, "AP Telephone",rtpInfo); //add the variable name of the RTP
 
 	//Registering the Agents and their respective behaviour into the Platform
 	APTelephone.agent_init(&APTelephone, &Person1, &phonePerson1);
@@ -144,8 +164,8 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(ONE_MINUTE_IN_TICKS)){
-			printf("Brenda aca");
+		if ((actual_tick-startTick)>=(3*ONE_MINUTE_IN_TICKS)){
+			printf("************ VxMAES app execution stops ******************");
 			break;
 		}
 	}

@@ -18,7 +18,7 @@
  *  	Output: The Agent's ID.
  */
 Agent_AID AIDX(MAESAgent* MAESagent) {
-	return MAESagent->agent.aid; //REVISAR
+	return MAESagent->agent.aid; 
 };
 
 /**
@@ -30,7 +30,7 @@ Agent_AID AIDX(MAESAgent* MAESagent) {
 void MAESAgentX(MAESAgent* MAESagent,char* name, STATUS pri, MAESStackSize sizeStack)
 {
 	MAESagent->agent.aid = NULL;
-	MAESagent->agent.mailbox_handle = NULL;
+	MAESagent->agent.queue_id = NULL;
 	MAESagent->agent.agent_name = name;
 	MAESagent->agent.priority = pri;
 	MAESagent->resources.stackSize = sizeStack;

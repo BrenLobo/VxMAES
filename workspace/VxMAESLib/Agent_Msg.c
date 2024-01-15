@@ -35,14 +35,14 @@ bool isRegisteredFunction(Agent_Msg* Message, Agent_AID aid) {
  *		 Inputs: The message instance itself and the agent AID.
  * 		Outputs: The message queue ID of the Agent.
  */
-Mailbox_Handle get_mailboxFunction(Agent_Msg* Message, Agent_AID aid) { 
+Queue_ID get_mailboxFunction(Agent_Msg* Message, Agent_AID aid) { 
 
 	MAESAgent* description = (MAESAgent*)env.get_taskEnv(&env, aid);
 	if (description == NULL) {
 		printf("Return NULL in get mailbox\n");
 		return NULL;
 	}
-	return description->agent.mailbox_handle;
+	return description->agent.queue_id;
 };
 
 /**
@@ -611,30 +611,7 @@ ERROR_CODE restartMsgFunction(Agent_Msg* Message, Agent_AID target_agent) {
 	{
 		return INVALID;
 	}
-}
-//};
-//ERROR_CODE restartMsgFunction(Agent_Msg* Message) {
-//	Agent_AID AMS;
-//	MAESAgent* agent_caller;
-//	MAESAgent* agent_target;
-//	agent_caller = (MAESAgent*)env.get_taskEnv(&env,Message->caller);
-//	agent_target = (MAESAgent*)env.get_taskEnv(&env,target_agent);
-//	Message->msg.type = REQUEST;
-//	Message->msg.content = (char*)"RESTART";
-//	Message->msg.target_agent = taskIdSelf();
-//	Message->msg.sender_agent = taskIdSelf();
-//	AMS = agent_caller->agent.AP;
-//	MsgObj msg= Message->msg;
-//
-//	if (msgQSend(Message->get_mailbox(Message,AMS),(char*)&msg , sizeof(msg),WAIT_FOREVER,MSG_PRI_NORMAL) != OK)
-//	{	
-//		return INVALID;
-//	}
-//	else
-//	{	
-//		return NO_ERRORS;
-//	}
-//};
+};
 
 /** 
  * Agent Message Constructor: This function assigns the class pointers to its corresponding function.

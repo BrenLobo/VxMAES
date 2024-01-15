@@ -26,7 +26,7 @@
 
 /* MAES Definitions */
 #define Agent_AID MAESTaskHandle_t		  // Agent ID
-#define Mailbox_Handle MAESQueueHandle_t  // Agent's Queue ID
+#define Queue_ID MAESQueueHandle_t  // Agent's Queue ID
 
 /***************************************************/
 /*            User Adjustable Configuration        */
@@ -38,7 +38,7 @@
 #define ORGANIZATIONS_SIZE 16			   // Maximum Members by Organization
 #define MAESmaxPriority 101 			   // The Higher priority for application      
 #define MAESminStacksize 50 			   // Minimum stack size
-#define MAXmsgLength 100				   // Maximum Message Lenght (bytes)
-#define ONE_MINUTE_IN_TICKS (sysClkRateGet() * 60)
+#define MAXmsgLength 100				   // Maximum Message Length (bytes)
+#define MinuteInTicks (sysClkRateGet() * 60)
 
 #endif /* VXMAESCONFIG_H_ */

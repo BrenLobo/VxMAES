@@ -8,8 +8,6 @@
 #ifndef VXMAES_H_
 #define VXMAES_H_
 
-/* includes  */
-
 #include <vxWorks.h>
 #include <taskLib.h>
 #include <msgQLib.h>
@@ -17,7 +15,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <sysLib.h>
-#include <semLib.h>
 #include "VxMAESconfig.h"
 
 

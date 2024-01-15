@@ -10,7 +10,8 @@
 #include "VxMAES.h"
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>  
+#include <time.h>
+
 
 /**********************************************/
 /*			    Enums and structs			  */
@@ -42,8 +43,8 @@ sysVars env;
 CyclicBehaviour CurrentBehaviour,VoltageBehaviour,TemperatureBehaviour, genBehaviour;
 Agent_Msg msg_current,msg_voltage,msg_temperature, msg_gen;
 logger_info log_current, log_voltage, log_temperature, *info, *infox;
-double min, max, value;
-char response[50];
+
+
 
 
 /******************************************************/
@@ -94,8 +95,12 @@ void Temperaturelogger(MAESArgument taskParam) {
 
 //action
 void genAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
+	double min, max, value;
 	Agent_info informacion = Platform.get_Agent_description(Platform.get_running_agent(&Platform));
-	printf("\n Agente en ejecucion: %s",informacion.agent_name);	
+	printf("\n Agente en ejecucion: %s \n",informacion.agent_name);	
+	printf("aca1\n")
+	char response[50]="";
+	printf("aca2\n")
 	Behaviour->msg->receive(Behaviour->msg,WAIT_FOREVER);
 	srand((unsigned int)time(NULL));
 	int i = (int)Behaviour->msg->get_msg_content(Behaviour->msg);
@@ -201,7 +206,7 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(3*ONE_MINUTE_IN_TICKS)){
+		if ((actual_tick-startTick)>=(3*MinuteInTicks)){
 			printf("************ VxMAES app execution stops ******************");
 			break;
 		}

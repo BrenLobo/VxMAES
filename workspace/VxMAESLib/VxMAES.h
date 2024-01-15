@@ -17,7 +17,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <sysLib.h>
-#include <semLib.h>
 #include "VxMAESconfig.h"
 
 
@@ -86,7 +85,7 @@ typedef enum
 	MODERATOR,
 	PARTICIPANT,
 	VISITOR,
-	NO_OT,//El macro NONE ya esta bloqueado por VxWorks
+	NO_OT,//MACRO NONE is already used in VxWorks
 }ORG_ROLE;
 
 typedef enum
@@ -118,7 +117,7 @@ typedef struct Agent_info Agent_info;
 struct Agent_info
 {
 	Agent_AID aid;
-	Mailbox_Handle mailbox_handle;
+	Queue_ID queue_id;
 	char* agent_name;
 	STATUS priority;
 	Agent_AID AP;
@@ -215,7 +214,7 @@ struct Agent_Msg {
 	
 	//Methods
 	bool (* isRegistered)(Agent_Msg*,Agent_AID aid); 
-	Mailbox_Handle (* get_mailbox)(Agent_Msg*,Agent_AID aid);
+	Queue_ID (* get_mailbox)(Agent_Msg*,Agent_AID aid);
 	void (*Agent_Msg)(Agent_Msg*);
 	ERROR_CODE (*add_receiver)(Agent_Msg*,Agent_AID aid_receiver);
 	ERROR_CODE (*remove_receiver)(Agent_Msg*,Agent_AID aid_receiver);
@@ -275,7 +274,7 @@ struct Agent_Platform {
 
 	//Methods
 	void (*Agent_Platform)(Agent_Platform* platform, char* name, Agent_AID rtpInfo);
-	void (*Agent_PlatformWithCond)(Agent_Platform* platform,  char* name, USER_DEF_COND* user_cond);
+	void (*Agent_PlatformWithCond)(Agent_Platform* platform,  char* name, USER_DEF_COND* user_cond,Agent_AID rtpInfo);
 	bool (*boot)(Agent_Platform* platform);
 	void (*agent_init)(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour);
 	void (*agent_initConParam)(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunction_t behaviour, MAESArgument taskParam);

@@ -8,7 +8,7 @@
 #include "VxMAES.h"
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>  
+#include <time.h>
 
 /**********************************************/
 /*			    Enums and structs			  */
@@ -39,8 +39,7 @@ sysVars env;
 CyclicBehaviour ins_behaviour, oil_behaviour, tire_behaviour,water_behaviour;
 Agent_Msg water_msg, oil_msg, tire_msg, ins_msg;
 bootable water_pass, oil_pass, tire_pass,*data;
-char content[80];
-float min, max, value;
+
 
 /**********************************************/
 /*   Function related to each measure agent   */
@@ -54,9 +53,11 @@ void meaSetup(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 
 // action
 void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
+	float min, max, value;
 	Agent_info informacion = AP.get_Agent_description(AP.get_running_agent(&AP));
 	printf("\n Running measurement agent: %s \n",informacion.agent_name);
 	data = (bootable*)taskParam;
+	char content[80];
 	int num =(int)data->type;
 	srand((unsigned int)time(NULL));
 	switch (num) {
@@ -264,7 +265,7 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(2*ONE_MINUTE_IN_TICKS)){
+		if ((actual_tick-startTick)>=(2*MinuteInTicks)){
 			printf("************ VxMAES app execution stops ******************");
 			break;
 		}

@@ -10,8 +10,7 @@
 #include "VxMAES.h"
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>  
-
+#include <time.h>
 /**********************************************/
 /*			    Enums and structs			  */
 /**********************************************/
@@ -42,8 +41,7 @@ sysVars env;
 CyclicBehaviour CurrentBehaviour,VoltageBehaviour,TemperatureBehaviour, genBehaviour;
 Agent_Msg msg_current,msg_voltage,msg_temperature, msg_gen;
 logger_info log_current, log_voltage, log_temperature, *info, *infox;
-double min, max, value;
-char response[50];
+
 
 
 /******************************************************/
@@ -96,8 +94,13 @@ void Temperaturelogger(MAESArgument taskParam) {
 void genAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = Platform.get_Agent_description(Platform.get_running_agent(&Platform));
 	printf("\n Agente en ejecucion: %s",informacion.agent_name);	
+	
+	char response[50]="";
+	double min, max, value;
+	printf("aca1\n");
 	Behaviour->msg->receive(Behaviour->msg,WAIT_FOREVER);
 	srand((unsigned int)time(NULL));
+	
 	int i = (int)Behaviour->msg->get_msg_content(Behaviour->msg);
 	switch (i)
 	{

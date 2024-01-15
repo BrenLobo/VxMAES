@@ -217,7 +217,7 @@ bool bootFunction(Agent_Platform* platform) {
 		platform->parameter->services = platform;
 		platform->parameter->ptr_env = &env;
 		platform->agentAMS.resources.stackSize = MAESminStacksize;
-		platform->agentAMS.agent.aid=taskCreate(platform->agentAMS.agent.agent_name,MAESmaxPriority,0, platform->agentAMS.resources.stackSize,(MAESTaskFunction_t)AMS_taskFunction, (MAESArgument)platform->parameter,0,0,0,0,0,0,0,0,0);
+		platform->agentAMS.agent.aid=taskCreate(platform->agentAMS.agent.agent_name,MAESmaxPriority,VX_FP_TASK, platform->agentAMS.resources.stackSize,(MAESTaskFunction_t)AMS_taskFunction, (MAESArgument)platform->parameter,0,0,0,0,0,0,0,0,0);
 		platform->description.AMS_AID = platform->agentAMS.agent.aid;
 		env.set_TaskEnv(&env,platform->agentAMS.agent.aid, &platform->agentAMS);
 		if (platform->agentAMS.agent.aid != NULL)
@@ -262,7 +262,7 @@ void agent_initFunction(Agent_Platform* platform, MAESAgent* agent, MAESTaskFunc
 		// Task
 		agent->resources.function = behaviour;
 		agent->resources.taskParameters = NULL;
-		agent->agent.aid= taskCreate(agent->agent.agent_name,agent->agent.priority,0,agent->resources.stackSize,agent->resources.function, 0, 0,0,0,0,0,0,0,0,0);//revisar
+		agent->agent.aid= taskCreate(agent->agent.agent_name,agent->agent.priority,VX_FP_TASK,agent->resources.stackSize,agent->resources.function, 0, 0,0,0,0,0,0,0,0,0);//revisar
 		env.set_TaskEnv(&env,agent->agent.aid, agent);
 	}
 };
@@ -281,7 +281,7 @@ void agent_initConParamFunction(Agent_Platform* platform, MAESAgent* agent, MAES
 		// Task
 		agent->resources.function = behaviour;
 		agent->resources.taskParameters = taskParam;
-		agent->agent.aid= taskCreate(agent->agent.agent_name,agent->agent.priority,0,agent->resources.stackSize, behaviour,taskParam, 0,0,0,0,0,0,0,0,0);
+		agent->agent.aid= taskCreate(agent->agent.agent_name,agent->agent.priority,VX_FP_TASK,agent->resources.stackSize, behaviour,taskParam, 0,0,0,0,0,0,0,0,0);
 		env.set_TaskEnv(&env,agent->agent.aid, agent);
 	}
 };
@@ -557,7 +557,7 @@ void restartFunction(Agent_Platform* platform, Agent_AID aid) {
 		a->agent.mailbox_handle = msgQCreate(1,MAXmsgLength,MSG_Q_FIFO);
 		
 		// Task
-		a->agent.aid=taskCreate(a->agent.agent_name, a->agent.priority,0,a->resources.stackSize,a->resources.function, a->resources.taskParameters, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		a->agent.aid=taskCreate(a->agent.agent_name, a->agent.priority,VX_FP_TASK,a->resources.stackSize,a->resources.function, a->resources.taskParameters, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 		env.set_TaskEnv(&env,a->agent.aid, a); 
 	}
 };
