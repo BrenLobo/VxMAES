@@ -63,8 +63,7 @@ void Meas_Action(CyclicBehaviour * Behaviour, MAESArgument taskParam) {
 	switch (num) {
 	case WATER: ///temp water
 		min = 85;//centi
-		max = 100;//centi
-		
+		max = 100;//centi		
 		value = (int)(rand() % 71 + 50);
 		if (value<min || value>max) {
 			snprintf(content, 80, "\r\n Check water temperature!!! Normal state 85-100 C, now is in %d\n", value);
@@ -265,8 +264,10 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
+		taskDelay(2000);
+		
 		if ((actual_tick-startTick)>=(2*MinuteInTicks)){
-			printf("************ VxMAES app execution stops ******************");
+			printf("\n************ VxMAES app execution stops ******************\n");
 			break;
 		}
 	}

@@ -164,8 +164,10 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(3*MinuteInTicks)){
-			printf("************ VxMAES app execution stops ******************");
+		taskDelay(2000);
+		
+		if ((actual_tick-startTick)>=(2*MinuteInTicks)){
+			printf("\n************ VxMAES app execution stops ******************\n");
 			break;
 		}
 	}

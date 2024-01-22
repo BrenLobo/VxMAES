@@ -265,7 +265,7 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(2*MinuteInTicks)){
+		if ((actual_tick-startTick)>=(1*MinuteInTicks)){
 			printf("************ VxMAES app execution stops ******************");
 			break;
 		}
