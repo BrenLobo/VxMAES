@@ -71,9 +71,7 @@ void personaction(OneShotBehaviour* Behaviour, MAESArgument taskParam) {
 	printf(" %s received message: %s , size: %d\n", information.agent_name, contenidoTel,  len_cont_tel);
 		
 	char *contenido = (char *)malloc(len_cont_tel+len_message+1);
-	
-//	printf("Size of total content: %zu\n", sizeof(contenido));
-	
+		
 	if (contenido != NULL){
 		//Copy to contenido all the existing string of contenidoTel
 		strcpy(contenido,contenidoTel);

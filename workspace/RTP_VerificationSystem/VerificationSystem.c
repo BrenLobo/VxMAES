@@ -215,9 +215,9 @@ int main() {
 	int startTick= tickGet();
 	
 	// parameters definition: rates, types, pass
-	tire_pass.rate=500;
-	water_pass.rate=1000;
-	oil_pass.rate=1500;
+	tire_pass.rate=1000;
+	water_pass.rate=1500;
+	oil_pass.rate=500;
 	water_pass.pass = false;
 	oil_pass.pass = false;
 	tire_pass.pass = false;
@@ -265,7 +265,7 @@ int main() {
 	while(1){
 		int actual_tick=tickGet();
 		
-		if ((actual_tick-startTick)>=(1*MinuteInTicks)){
+		if ((actual_tick-startTick)>=(2*MinuteInTicks)){
 			printf("************ VxMAES app execution stops ******************");
 			break;
 		}

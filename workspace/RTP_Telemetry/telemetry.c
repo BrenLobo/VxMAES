@@ -10,11 +10,10 @@
 #include "VxMAES.h"
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-/**********************************************/
-/*			    Enums and structs			  */
-/**********************************************/
-//Type of parameter
+#include <time.h>  
+
+
+/*Enums and structs*/
 typedef enum meas_type
 {
 	CURRENT,
@@ -22,7 +21,6 @@ typedef enum meas_type
 	TEMPERATURE
 }meas_type;
 
-// let boot parameter
 typedef struct logger_info
 {
 	meas_type type;
@@ -30,10 +28,7 @@ typedef struct logger_info
 }logger_info;
 
 
-/**********************************************/
-/* 		  Defining the app's variables.       */
-/**********************************************/
-
+//Defining the app's variables.
 
 MAESAgent logger_current,logger_voltage,logger_temperature,measurement;
 Agent_Platform Platform;
@@ -42,13 +37,8 @@ CyclicBehaviour CurrentBehaviour,VoltageBehaviour,TemperatureBehaviour, genBehav
 Agent_Msg msg_current,msg_voltage,msg_temperature, msg_gen;
 logger_info log_current, log_voltage, log_temperature, *info, *infox;
 
+//Functions related to the Logger Action Behaviour//
 
-
-/******************************************************/
-/*   Function related to the Logger Action Behavior   */
-/******************************************************/
-
-// logger action
 void loggerAction(CyclicBehaviour* Behaviour,MAESArgument taskParam) {
 	info= (logger_info*)taskParam;
 	Behaviour->msg->set_msg_content(Behaviour->msg, (char*)info->type);
@@ -86,42 +76,38 @@ void Temperaturelogger(MAESArgument taskParam) {
 
 
 
-/******************************************************/
-/*     Function related to the Generator Behavior     */
-/******************************************************/
+//Functions related to the Generator Behaviour//
 
-//action
 void genAction(CyclicBehaviour* Behaviour, MAESArgument taskParam) {
 	Agent_info informacion = Platform.get_Agent_description(Platform.get_running_agent(&Platform));
-	printf("\n Agente en ejecucion: %s",informacion.agent_name);	
+	printf("\n Running Agent: %s",informacion.agent_name);	
 	
 	char response[50]="";
-	int min, max, value;
+	double min, max, value;
 	Behaviour->msg->receive(Behaviour->msg,WAIT_FOREVER);
 	srand((unsigned int)time(NULL));
-	
 	int i = (int)Behaviour->msg->get_msg_content(Behaviour->msg);
 	switch (i)
 	{
 	case CURRENT:
-		min = 1; //mA
+		min = 0.1; //mA
 		max = 1000; //mA
-		value = (int)(min + rand() / (RAND_MAX / (max - min + 1) + 1));
-		snprintf(response, 50, "\r\nCurrent measurement: %d\r", value);
+		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
+		snprintf(response, 50, "\r\nCurrent mesasurment: %f\r", value);
 		break;
 
 	case VOLTAGE:
-		min = 0; //V
-		max = 4; //V
-		value = (int)(min + rand() / (RAND_MAX / (max - min + 1) + 1));
-		snprintf(response, 50, "\r\nVoltage measurement: %d\r", value);
+		min = 0.5; //V
+		max = 3.3; //V
+		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
+		snprintf(response, 50, "\r\nVoltage mesasurment: %f\r", value);
 		break;
 
 	case TEMPERATURE:
 		min = 30; //C
 		max = 100; //C
-		value = (int)(min + rand() / (RAND_MAX / (max - min + 1) + 1));
-		snprintf(response, 50, "\r\nTemperature measurement: %f\r", value);
+		value = min + rand() / (RAND_MAX / (max - min + 1) + 1);
+		snprintf(response, 50, "\r\nTemperature mesasurment: %f\r", value);
 		break;
 
 	default:
@@ -142,21 +128,14 @@ void gen(MAESArgument taskParam) {
 	genBehaviour.execute(&genBehaviour, taskParam);
 };
 
-/**********************************************/
-/* 						Main				  */
-/**********************************************/
+//Main
 int main() {
-	
 	printf("------Telemetry------ \n");
-	
-
-	//ticks counter
 	int startTick= tickGet();
-	
-	// parameters definition: rates, types
+	//Rates and types for each logger.
 	log_current.rate = 500;
-	log_voltage.rate = 1000;
-	log_temperature.rate = 1500;
+	log_voltage.rate = 1500;
+	log_temperature.rate = 1000;
 	log_current.type = CURRENT;
 	log_voltage.type = VOLTAGE;
 	log_temperature.type = TEMPERATURE;
@@ -177,24 +156,22 @@ int main() {
 	ConstructorCyclicBehaviour(&TemperatureBehaviour);
 	ConstructorCyclicBehaviour(&genBehaviour);
 
-	//Defining the RPT task (change name in each RTP)
-	TASK_ID rtpInfo=taskIdSelf();
-	
 	//Initializing the Agents and the Platform.
-	logger_current.Iniciador(&logger_current, "Current Logger", 201, 100);
-	logger_voltage.Iniciador(&logger_voltage, "Voltage Logger", 202, 100);
-	logger_temperature.Iniciador(&logger_temperature, "Temperature Logger", 203, 100);
-	measurement.Iniciador(&measurement, "Measure", 200, 10);	
-	Platform.Agent_Platform(&Platform, "telemetry_platform",rtpInfo);//add the variable of the RTP
+	logger_current.Iniciador(&logger_current, "Current Logger", 105, 100);
+	logger_voltage.Iniciador(&logger_voltage, "Voltage Logger", 104, 100);
+	logger_temperature.Iniciador(&logger_temperature, "Temperature Logger", 103, 100);
+	measurement.Iniciador(&measurement, "Measure", 102, 10);
+	
+	TASK_ID rtpInfo=taskIdSelf();
+	Platform.Agent_Platform(&Platform, "telemetry_platform",rtpInfo);
 
 	//Registering the Agents and their respective behaviour into the Platform
-	Platform.agent_init(&Platform, &measurement, &gen);
 	Platform.agent_initConParam(&Platform, &logger_temperature, &Temperaturelogger, (MAESArgument)&log_temperature);
 	Platform.agent_initConParam(&Platform, &logger_voltage, &Voltagelogger, (MAESArgument)&log_voltage);
 	Platform.agent_initConParam(&Platform,&logger_current, &Currentlogger, (MAESArgument)&log_current);
-	printf("CMAES booted successfully \n");
-	printf("Initiating APP\n\n");
-	
+	Platform.agent_init(&Platform, &measurement, &gen);
+	printf("Initiating APP\n\n");	
+
 	//Platform Init
 	Platform.boot(&Platform);
 	
@@ -202,8 +179,9 @@ int main() {
 	// Start the scheduler so the created tasks start executing.
 	while(1){
 		int actual_tick=tickGet();
+		taskDelay(200);
 		
-		if ((actual_tick-startTick)>=(MinuteInTicks)){
+		if ((actual_tick-startTick)>=(4*MinuteInTicks)){
 			printf("************ VxMAES app execution stops ******************");
 			break;
 		}
