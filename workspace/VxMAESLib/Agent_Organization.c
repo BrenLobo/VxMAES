@@ -64,8 +64,8 @@ ERROR_CODE createFunction(Agent_Platform* platform, Agent_Organization* Organiza
 
 /**
  * Destroy Function: This function destroys an organization. 
- * Inputs: The organization instance itself.
- * Outputs: An error code indicating if destroying the organization was successful.
+ * 			Inputs: The organization instance itself.
+ * 			Outputs: An error code indicating if destroying the organization was successful.
  */
 ERROR_CODE destroyFunction(Agent_Organization* Organization) {
 	if (Organization->description.owner == taskIdSelf())
@@ -108,7 +108,7 @@ ERROR_CODE isMemberFunction(Agent_Organization* Organization, Agent_AID aid) {
 };
 
 /** 	
- * Is Banned Function: This function searches for an agent in the organization. 
+ * Is Banned Function: This function searches for a banned agent in the organization. 
  * 			 Inputs: The organization instance itself and the agent AID.
  * 			Outputs: An error code indicating if the agent was banned from the organization.
  */ERROR_CODE isBannedFunction(Agent_Organization* Organization, Agent_AID aid) {
@@ -409,8 +409,8 @@ org_info get_infoFunction(Agent_Organization* Organization) {
 
 /** 
  * Get Size Function: This function returns the organization's size. 
- * Inputs: The organization instance itself.
- * Outputs: The amount of agents that can be registered in the organization.
+ * 			Inputs: The organization instance itself.
+ * 			Outputs: The amount of agents that can be registered in the organization.
  */
 MAESUBaseType_t get_sizeFunction(Agent_Organization* Organization) {
 	return Organization->description.members_num;
